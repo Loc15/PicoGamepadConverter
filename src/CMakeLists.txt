@@ -59,7 +59,7 @@ target_compile_options(${target_name} PRIVATE -Wall -Wextra)
 target_compile_definitions(${target_name} PRIVATE PIO_USB_USE_TINYUSB)
 
 # what build use
-add_compile_definitions(PICO_W=0)
+add_compile_definitions(PICO_W=1)
 
 # needed so tinyusb can find tusb_config.h
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR} device_files/switch device_files/xinput host_files)

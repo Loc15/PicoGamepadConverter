@@ -29,11 +29,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 ### Installation
 
-1. Download the build program and copy on the microcontroller.
-
-   ```
-   git clone https://github.com/Loc15/PicoGamepadConverter.git
-   ```
+1. [Download](https://github.com/Loc15/PicoGamepadConverter/releases) the build program and copy on the microcontroller.
 
 2. Make the conections.
 
