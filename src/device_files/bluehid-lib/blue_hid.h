@@ -1,0 +1,1 @@
+int btstack_hid(void *switch_data);

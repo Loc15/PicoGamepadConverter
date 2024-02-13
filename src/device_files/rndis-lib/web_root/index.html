@@ -1,0 +1,210 @@
+<!DOCTYPE html><html><head><title>Configuration mode</title><style>body{
+    margin: 0;
+    background-color: #1D7874;
+    font-family: Ubuntu, monospace;
+    font-weight: 400;
+}
+
+
+.header{
+    background-color: #4CAF50;
+    border: solid black;
+    border-width: 0 0 4px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.center{
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+.div_all{
+    width: 500px;
+    padding: 20px;
+    background-color: #B0D0D3;
+    box-shadow: 8px 8px;
+    border: 2px solid black;
+    border-radius: 10px 20px;
+}
+
+.select_c{
+    padding: 10px 10px;
+    border: 2px solid black;
+    border-radius: 5px 5px;
+}
+
+.div_bluetooth{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn {
+    background-color: #4CAF50; /* Green */
+    border: solid black;
+    color: white;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    border-radius: 10px;
+    box-shadow: 0 9px #000000;
+}
+
+.btn:hover {background-color: orange}
+.btn:active{
+    box-shadow: 0 5px #000000;
+    transform: translateY(4px);
+}
+
+.wrapperDiv{
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5em;
+}
+
+.select_div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.options{
+    color: black;
+    background-color: orange;
+    text-align: center;
+    font-size: 15px;
+    width: 90px;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.input_mac{
+    font-size: medium;
+    border: 2px solid black;
+    border-radius: 5px 5px;
+}
+
+input:valid {
+    background-color: palegreen;
+}
+
+input:invalid {
+    background-color: lightpink;
+}
+
+#features_btn_div{
+    display: flex;
+    justify-content: center;
+    padding-top: 10em;
+}
+
+#features{
+    background-color: indigo;
+    border: solid black;
+    color: white;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    border-radius: 5px 10px;
+}
+
+#features:hover{
+    background-color: orange;
+}
+
+</style></head><body><div class="header"><h1>Configuration mode</h1><p><em>Choose the host and device mode</em></p></div><div class="center"><div class="div_all"><div class="wrapperDiv"><div class="select_div"><p>Host</p><select class="select_c options" id="host"><option>Xinput</option><option>Dinput</option><option>Keyboard PS/2</option><option>PS1/PS2</option><option>Bluetooth</option></select></div><div class="select_div"><p>Device</p><select class="select_c options" id="device"><option>Xinput</option><option>Switch</option><option>Dinput</option><option>Bluetooth</option></select></div></div><div class="wrapper"><button class="btn" id="save">Save</button></div></div></div><div id="features_btn_div"><a href="features.html"><button id="features">Go to set features</button></a></div><script>const value_of_options = {'Xinput':0, 'Switch':1, 'Dinput':2,
+    'Keyboard PS/2':3, 'PS1/PS2':4, 'Bluetooth': 5};
+
+const bluetooth_hid_options ={'GENERIC': 0, 'PS4': 2, '8BITDO': 5};
+
+const sendButton = document.getElementById('save');
+const deviceOption = document.getElementById('device');
+const hostOption = document.getElementById('host');
+
+let bluetooth_select = false;
+const parentNode = sendButton.parentNode;
+
+function bluetoothOptions() {
+    const new_options = document.createElement('div');
+    new_options.className = "div_bluetooth";
+    const select = document.createElement('select');
+    select.className = "select_c";
+    select.id = "blue_hid";
+    const options = Object.keys(bluetooth_hid_options);
+    for(const text of options) {
+        let option = document.createElement('option');
+        option.text = text;
+        select.appendChild(option);
+    }
+    new_options.appendChild(select);
+    const p_mac = document.createElement('p');
+    p_mac.textContent = "MAC address";
+    new_options.appendChild(p_mac);
+    const mac_input = document.createElement('input');
+    mac_input.className = "input_mac";
+    mac_input.type = "text";
+    mac_input.id = "mac_input";
+    mac_input.pattern = "^[a-fA-F0-9]{2}(:[a-fA-F0-9]{2}){5}$";
+    new_options.appendChild(mac_input);
+    parentNode.insertBefore(new_options, sendButton);
+}
+
+function removeBluetoothOptions(){
+    parentNode.removeChild(parentNode.children[0])
+}
+
+hostOption.addEventListener("change", function () {
+    if(hostOption.value === "Bluetooth"){
+        console.log("Es bluetooth");
+        bluetooth_select = true;
+        bluetoothOptions();
+    }
+    else if(bluetooth_select){
+        removeBluetoothOptions();
+        bluetooth_select = false;
+    }
+});
+function get_data(){
+    var send_data = {"host":0, "device":0};
+    send_data["host"] = value_of_options[hostOption.value];
+    send_data["device"] = value_of_options[deviceOption.value];
+    if(bluetooth_select){
+        let mac = document.getElementById("mac_input");
+        if(mac.checkValidity()){
+            mac = mac.value.split(':').map(function (hex) {
+                return parseInt(hex, 16);
+            });
+            send_data.mac = mac;
+            send_data.bhid = bluetooth_hid_options[document.
+                getElementById("blue_hid").value];
+            console.log(send_data);
+        }
+    }
+    return send_data;
+}
+
+sendButton.onclick = ()=>fetch('/set_mode', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(get_data())
+}).then(function (response) {
+    if(response.ok){
+        alert("Configuration saved!");
+    }
+}).catch(err => console.log(err));
+</script></body></html>

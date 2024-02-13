@@ -1,0 +1,242 @@
+<!DOCTYPE html><html><head><title>Set features</title><style>body{
+    margin: 0;
+    background-color: #1D7874;
+    font-family: Ubuntu, monospace;
+    font-weight: 400;
+}
+
+ul{
+    /*remove bullet*/
+    list-style-type: none;
+}
+
+li{
+    background-color: #B0D0D3;
+    box-shadow: 8px 8px;
+    border-style: solid;
+    border-radius: 5px 10px;
+    width: 500px;
+    margin:0 0 20px 0;
+}
+
+.header{
+    background-color: #4CAF50;
+    border: solid black;
+    border-width: 0 0 4px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.box_li{
+    padding: 10px 10px;
+}
+
+input[type=checkbox]{
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+.label_checkbox {
+    cursor: pointer;
+    width: 50px;
+    height: 30px;
+    background: #4CAF50;
+    display: block;
+    border: 2px solid black;
+    border-radius: 100px;
+    position: relative;
+}
+
+.label_checkbox:after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 2px solid black;
+    border-radius: 90px;
+    transition: 0.2s;
+}
+
+.switch-button:checked + .label_checkbox {
+    background: orange;
+}
+
+.switch-button:checked + .label_checkbox:after {
+    transform: translateX(80%);
+}
+
+.label_checkbox:active:after {
+    width: 50px;
+}
+
+.slider_box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding-block: 1em;
+    padding-left: 0.5em;
+    gap: 0 0.5em;
+}
+
+#back_div{
+    display: flex;
+    justify-content: end;
+    padding-top: 5em;
+}
+
+.navigation{
+    background-color: indigo;
+    border: solid black;
+    color: white;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    border-radius: 5px 10px;
+}
+
+.navigation:hover{
+    background-color: orange;
+}
+
+#save_div{
+    display: flex;
+    justify-content: center;
+    padding-block: 2em;
+}
+
+.save_btn {
+    background-color: #4CAF50; /* Green */
+    border: solid black;
+    color: white;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    border-radius: 10px;
+    box-shadow: 0 9px #000000;
+}
+
+.save_btn:hover {background-color: orange}
+.save_btn:active{
+    box-shadow: 0 5px #000000;
+    transform: translateY(4px);
+}
+
+#enable_div{
+    padding-left: 20px;
+    border: solid black;
+    border-width: 0 0 4px 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+
+</style></head><body><div class="header"><h1>Set features</h1><p><em>Choose features to set</em></p></div><div id="enable_div"><p><b>Enable features</b></p><input class="switch-button" type="checkbox" id="enable_features"><label class="label_checkbox" for="enable_features"></label></div><div id="option_box"><ul><li><div class="box_li"><p>Block Analog</p><div class="slider_box"><input class="switch-button" type="checkbox" id="block_L"><label class="label_checkbox" for="block_L"></label><p>Left Analog</p></div><div class="slider_box"><input class="switch-button" type="checkbox" id="block_R"><label class="label_checkbox" for="block_R"></label><p>Right Analog</p></div></div></li><li><div class="box_li"><p>Swap Dpad</p><div class="slider_box"><input class="switch-button" type="checkbox" id="Swap Dpad"><label class="label_checkbox" for="Swap Dpad"></label></div></div></li><li><div class="box_li"><p>Deadzone</p><div class="slider_box"><input class="switch-button" type="checkbox" id="Deadzone_L"><label class="label_checkbox" for="Deadzone_L"></label><p>Left Analog</p><input type="range" id="slider_left" min="0" max="100" value="0" step="5" oninput="this.nextSibling.value = this.value"><output id="value_slider_L"></output></div><div class="slider_box"><input class="switch-button" type="checkbox" id="Deadzone_R"><label class="label_checkbox" for="Deadzone_R"></label><p>Right Analog</p><input type="range" id="slider_right" min="0" max="100" value="0" step="5" oninput="this.nextSibling.value = this.value"><output id="value_slider_R"></output></div></div></li></ul></div><div id="save_div"><button class="save_btn" id="save_features">Save features</button></div><div id="back_div"><a href="/"><button class="navigation">Back to config mode</button></a></div><script>const value_of_features = {'Block Analog':0, 'Swap Dpad':1, 'Deadzone':2};
+
+const enable_switch = document.getElementById("enable_features");
+let option_box_div = document.getElementById("option_box");
+let option_box_div_copy = option_box_div.cloneNode(true);
+const body = document.getElementsByTagName("body")[0];
+let enable_deadzone = document.getElementById("Deadzone");
+let dead_zone_childs = document.getElementsByClassName("slider_box");
+const set_features = document.getElementById("save_features");
+
+
+//remove options because I can't disable hahaha
+option_box_div.remove();
+
+enable_switch.onchange = function () {
+    if(enable_switch.checked){
+        body.insertBefore(option_box_div_copy, enable_switch.parentNode.nextSibling);
+        option_box_div = option_box_div_copy;
+
+    }
+    else{
+        option_box_div_copy = option_box_div;
+        option_box_div.remove();
+    }
+}
+
+function get_features(){
+    let send_features = {"features":[0,0,0,0,0,0,0,0,0,0], "data":[0,0,0,0,0,0,0,0]};
+
+    if(!enable_switch.checked){
+        //enable
+        send_features["features"][0] = 0;
+        //size
+        send_features["features"][1] = 0;
+    }
+    else{
+        let counter = 0;
+        send_features["features"][0] = 1;
+
+        const block_L = document.getElementById("block_L");
+        const block_R = document.getElementById("block_R");
+        if(block_L.checked || block_R.checked){
+            send_features["features"][counter + 2] = value_of_features["Block Analog"];
+            counter++;
+
+            let block = 0;
+
+            if(block_L.checked){
+                block |= 1;
+            }
+
+            if(block_R.checked){
+                block |= (1 << 1);
+            }
+            send_features["data"][0] = block;
+        }
+        const swap_dpad_f = document.getElementById("Swap Dpad");
+        if(swap_dpad_f.checked){
+            send_features["features"][counter + 2] = value_of_features["Swap Dpad"];
+            counter++;
+        }
+
+        const dead_zone_L = document.getElementById("Deadzone_L");
+        const dead_zone_R = document.getElementById("Deadzone_R");
+        if(dead_zone_L.checked || dead_zone_R.checked){
+            send_features["features"][counter + 2] = value_of_features["Deadzone"];
+            counter++;
+            //get data from sliders
+            if(dead_zone_L.checked){
+                const slider_L = document.getElementById("slider_left");
+                send_features["data"][value_of_features["Deadzone"] - 1] =  ( 1 << 7) |
+                    (0x7F & slider_L.value);
+            }
+
+            if(dead_zone_R.checked){
+                const slider_R = document.getElementById("slider_right");
+                send_features["data"][value_of_features["Deadzone"]] =  ( 1 << 7) |
+                    (0x7F & slider_R.value);
+            }
+        }
+
+        send_features["features"][1] = counter;
+
+    }
+
+    return send_features;
+}
+
+set_features.onclick = ()=>fetch('/set_features', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(get_features())
+}).then(function (response) {
+    if(response.ok){
+        alert("Features saved!");
+    }
+}).catch(err => console.log(err));
+</script></body></html>
