@@ -7,3 +7,6 @@
 [submodule "src/device_files/rndis-lib/src/device_files/rndis-lib/mongoose"]
 	path = src/device_files/rndis-lib/src/device_files/rndis-lib/mongoose
 	url = https://github.com/cesanta/mongoose.git
+[submodule "src/device_files/rndis-lib/mongoose"]
+	path = src/device_files/rndis-lib/mongoose
+	url = https://github.com/cesanta/mongoose.git
