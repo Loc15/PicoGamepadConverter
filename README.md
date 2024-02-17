@@ -2,7 +2,7 @@
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O4O8TQSC8)
 
-PicoGamepadCoverter is a project designed for RP2040 or Raspberry Pi Pico and variants, that enabling switch to different gamepad modes using a gamepad as input. Re-use old gamepads that dont't support USB conecctions or make compatibles with certain platafform.
+PicoGamepadCoverter is a project designed for RP2040 or Raspberry Pi Pico and variants, that enabling switch to different gamepad modes using a gamepad as input. Re-use old gamepads that don't support USB connections or make compatibles with certain platform.
 
 ---
 ## Features
@@ -20,10 +20,10 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 ### Prerequisites
 
-- Raspberry Pi Pico microcontroller or onother RP2040 boards.
-- OTG cable (micro-USB or USB-C it depents on your board)
+- Raspberry Pi Pico microcontroller or another RP2040 boards.
+- OTG cable (micro-USB or USB-C it depends on your board)
 - USB female connector (Recommended be the same type of OTG cable)
-- USB cable (micro-USB or USB-C it depents on your board)
+- USB cable (micro-USB or USB-C it depends on your board)
 - Two push buttons (_Optional but RECOMMENDED!_)
 - Breadboard (_Optional_)
 
@@ -31,7 +31,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 1. [Download](https://github.com/Loc15/PicoGamepadConverter/releases) the build program and copy on the microcontroller.
 
-2. Make the conections.
+2. Make the connections.
 
 ![schematic](./docs/pico_pinout.png)
 ![conections1](./docs/bread_board1.jpg)
@@ -50,11 +50,11 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 ### Additional information
 
-- The led on board indicates that a gamepad has been mounted successfully, it works on all host modes except **Keyboard PS/2**
+- The LED onboard indicates that a gamepad has been mounted successfully, it works on all host modes except **Keyboard PS/2**
 
 - The additional USB female connector PINS are **16** and **17 GPIO**.  
 
-- The conection for Keyboard PS/2 are on **19 GPIO** for **DATA PIN** and **20 GPIO** for **CLOCK PIN**.
+- The connection for Keyboard PS/2 are on **19 GPIO** for **DATA PIN** and **20 GPIO** for **CLOCK PIN**.
 
 ![keyboard_schematic](./docs/keyboard_pinout.png)
 ![keyboard_connector](./docs/keyboard_connector.jpg)
@@ -70,7 +70,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 - On Bluetooth device mode, the host connection is on **native usb female connector on the microcontroller**.
 
-- On Bluetooth host mode you must put the mac adress of your gamepad. You can get this adress connecting you gamepad to a PC or a mobile phone. This adress _should_ be put just once time, next time you just need choose the mode.
+- On Bluetooth host mode you must put the mac address of your gamepad. You can get this address connecting you gamepad to a PC or a mobile phone. This address _should_ be put just once time, next time you just need choose the mode.
 
 ---
 ## Modes
@@ -111,7 +111,7 @@ You can to set some additional configuration if you required:
 ---
 
 ## Testing
-Controllers that was tested on diferent host modes.
+Controllers that was tested on different host modes.
  
 | Tested Controllers     | 	Modes (Host) |
 | ------------------     | -------------- |
@@ -130,7 +130,7 @@ Controllers that was tested on diferent host modes.
 
 - 8bitdo controllers sometimes have problems to connect on USB or Bluetooth mode. On USB if it doesn't connect reboot the microcontroller without disconnect. 
 
-- On Bluetooth if doesn't connect on first, reboot and put your gamepad on pair mode.
+- On Bluetooth if it doesn't connect on first, reboot and put your gamepad on pair mode.
 
 ---
 ## Acknowledgments

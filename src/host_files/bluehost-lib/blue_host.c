@@ -236,8 +236,8 @@ void btstack_host(void (*fn)(void *)){
 
     hid_host_setup();
 
-    printf("la direccion seteada es %s\n", bd_addr_to_str(remote_addr));
-    printf("El tipo de HID es %d\n", TYPE);
+    printf("Saved MAC address -> %s\n", bd_addr_to_str(remote_addr));
+    printf("HID type -> %d\n", TYPE);
 
     // Turn on the device 
     hci_power_control(HCI_POWER_ON);
