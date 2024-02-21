@@ -65,6 +65,8 @@ void psx_init(uint pio, uint gpio_output, uint gpio_input, void (*fn)(uint32_t *
     pio_gpio_init(psx_pio, gpio_output+2);
     pio_gpio_init(psx_pio, gpio_input);
     gpio_pull_up(gpio_input);
+    gpio_pull_up(gpio_output+1);
+    gpio_pull_up(gpio_output+2);
     pio_sm_set_consecutive_pindirs(psx_pio, sm, gpio_output, 3, true);
     pio_sm_set_consecutive_pindirs(psx_pio, sm, gpio_input, 1, false);
     float div = (float)clock_get_hz(clk_sys) / (6 * 12500);
