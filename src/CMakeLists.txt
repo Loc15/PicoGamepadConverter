@@ -47,6 +47,7 @@ add_subdirectory(host_files/parser-lib)
 add_subdirectory(host_files/bluehost-lib)
 add_subdirectory(device_files/rndis-lib)
 add_subdirectory(device_files/bluehid-lib)
+add_subdirectory(device_files/psx-device)
 add_subdirectory(flash-lib)
 
 pico_enable_stdio_uart(${target_name} 1)
@@ -65,7 +66,7 @@ add_compile_definitions(PICO_W=1)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR} device_files/switch device_files/xinput host_files)
 
 target_link_libraries(${target_name} PRIVATE pico_stdlib pico_pio_usb pico_cyw43_arch_none tinyusb_device tinyusb_host ps2kbd-lib psx-lib rndis-lib parser-lib 
-	bluehost-lib flash-lib bluehid-lib)
+	bluehost-lib flash-lib bluehid-lib psx-device)
 
 
 pico_add_extra_outputs(${target_name})

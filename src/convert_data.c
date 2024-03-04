@@ -4,6 +4,7 @@
 //Device
 #include "SwitchDescriptors.h"
 #include "PS3_Descriptors.h"
+#include "controller_simulator.h"
 //Host
 #include "xinput_definitions.h"
 #include "hid_definitions.h"
@@ -226,6 +227,29 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
             device_report->r_y_axis = XINPUT_TO_HID_Y(host_report.sThumbRY);
             }
             break;
+        case PSX:{
+            PSXInputState *device_report = new_report;
+
+            /*new data*/
+            device_report->buttons1 = ~(((host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP ? 1 : 0)<<PSX_DEVICE_UP) | ((host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ? 1 : 0)<<PSX_DEVICE_RIGHT) |
+                                        ((host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ? 1 : 0)<<PSX_DEVICE_DOWN) | ((host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ? 1 : 0)<<PSX_DEVICE_LEFT) |
+                                        ((host_report.wButtons & XINPUT_GAMEPAD_START ? 1 : 0)<<PSX_DEVICE_START) | ((host_report.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB ? 1 : 0)<<PSX_DEVICE_R3) |
+                                        ((host_report.wButtons & XINPUT_GAMEPAD_LEFT_THUMB ? 1 : 0)<<PSX_DEVICE_L3) | ((host_report.wButtons & XINPUT_GAMEPAD_BACK ? 1 : 0)<<PSX_DEVICE_SELECT));
+
+            device_report->buttons2 = ~(((host_report.wButtons & XINPUT_GAMEPAD_A ? 1 : 0)<<PSX_DEVICE_CROSS) | ((host_report.wButtons & XINPUT_GAMEPAD_B ? 1 : 0)<<PSX_DEVICE_CIRCLE) |
+                                        ((host_report.wButtons & XINPUT_GAMEPAD_X ? 1 : 0)<<PSX_DEVICE_SQUARE) | ((host_report.wButtons & XINPUT_GAMEPAD_Y ? 1 : 0)<<PSX_DEVICE_TRIANGLE) |
+                                        ((host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ? 1 : 0)<<PSX_DEVICE_R1) | ((host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ? 1 : 0)<<PSX_DEVICE_L1) |
+                                        ((host_report.bRightTrigger > 127 ? 1 : 0)<<PSX_DEVICE_R2) | ((host_report.bLeftTrigger > 127 ? 1 : 0)<<PSX_DEVICE_L2));
+
+            device_report->lx = XINPUT_TO_HID_X(host_report.sThumbLX);
+            device_report->ly = XINPUT_TO_HID_Y(host_report.sThumbLY);
+            device_report->rx = XINPUT_TO_HID_X(host_report.sThumbRX);
+            device_report->ry = XINPUT_TO_HID_Y(host_report.sThumbRY);
+
+            device_report->l2 = host_report.bLeftTrigger;
+            device_report->r2 = host_report.bRightTrigger;
+        }
+        break;
         default:
             /*XINPUT*/
             //diferent structure host -> device
@@ -242,7 +266,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
 
 void set_features_from_flash(unsigned char *data){
     //set features 
-    features.set_features = data[0];
+    //void incorrect data from flash
+    features.set_features = (data[0] > 1 ? 0 : data[0]);
     //num features
     features.num_enabled_features = data[1];
     //enabled features

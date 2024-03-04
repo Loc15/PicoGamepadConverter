@@ -20,6 +20,26 @@
 #define PSX_GAMEPAD_SQUARE 0x80
 
 
+//PS1/PS2 DEVICE MODE struct format
+#define PSX_DEVICE_LEFT   7
+#define PSX_DEVICE_DOWN   6
+#define PSX_DEVICE_RIGHT  5
+#define PSX_DEVICE_UP     4
+#define PSX_DEVICE_START  3
+#define PSX_DEVICE_R3     2
+#define PSX_DEVICE_L3     1
+#define PSX_DEVICE_SELECT 0
+
+#define PSX_DEVICE_SQUARE   7
+#define PSX_DEVICE_CROSS    6
+#define PSX_DEVICE_CIRCLE   5
+#define PSX_DEVICE_TRIANGLE 4
+#define PSX_DEVICE_R1       3
+#define PSX_DEVICE_L1       2
+#define PSX_DEVICE_R2       1
+#define PSX_DEVICE_L2       0
+
+
 
 
 

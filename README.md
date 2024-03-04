@@ -10,7 +10,7 @@ PicoGamepadCoverter is a project designed for RP2040 or Raspberry Pi Pico and va
 - Read input from USB and Bluetooth controllers.
 - Read inputs from no USB peripherals.
 - Web interface to choose between modes.
-- Different out modes (Dinput, Xinput, Switch, Bluetooth)
+- Different out modes (Dinput, Xinput, Switch, Bluetooth, PS1/PS2)
 - Easy to use, no overcomplicated options.
 
 ---
@@ -60,7 +60,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 ![keyboard_connector](./docs/keyboard_connector.jpg)
 ![keyboard_pc](./docs/keyboard_pc.jpg)
 
-- The conection for PS1 controllers are on **19 GPIO** for **COMMAND PIN**, **20 GPIO** for **CLOCK PIN**, **21 GPIO** for **ATTENTION PIN** and **22 GPIO** for **DATA PIN**
+- The connection for PS1 controllers are on **19 GPIO** for **COMMAND PIN**, **20 GPIO** for **CLOCK PIN**, **21 GPIO** for **ATTENTION PIN** and **22 GPIO** for **DATA PIN**
 
 ![ps1_schematic](./docs/ps1_pinout.png)
 ![ps1_connector](./docs/ps1_connector.jpg)
@@ -71,6 +71,12 @@ To get started with PicoGamepadConverter, follow the steps below:
 - On Bluetooth device mode, the host connection is on **native usb female connector on the microcontroller**.
 
 - On Bluetooth host mode you must put the mac address of your gamepad. You can get this address connecting you gamepad to a PC or a mobile phone. This address _should_ be put just once time, next time you just need choose the mode.
+
+- The connection for PS1/PS2 device mode are on **19 GPIO** for **DATA PIN**, **20 GPIO** for **COMMAND PIN**, **21 GPIO** for **ATTENTION PIN**, **22 GPIO** for **CLOCK PIN** and **26 GPIO** for **ACKNOWLEDGE PIN**.
+
+- On PS1/PS2 device mode, the host connection is on **native usb female connector on the microcontroller**.
+
+![ps1_ps2_device_connection](./docs/PS1_PS2_pinout.png)
 
 ---
 ## Modes
@@ -96,6 +102,9 @@ Exist two parameter to choose on web interface, **host** and **device**. The fir
 
 #### Wireless MODES
 - Bluetooth: Simulation of a generic HID gamepad.
+
+#### SPECIAL MODES
+- PS1/PS2: Simulation of a PS1 or PS2 controller.
 
 ---
 ## Features
@@ -128,7 +137,7 @@ Controllers that was tested on different host modes.
 
 ### Troubleshooting
 
-- 8bitdo controllers sometimes have problems to connect on USB or Bluetooth mode. On USB if it doesn't connect reboot the microcontroller without disconnect. 
+- 8bitdo controllers sometimes have problems to connect on USB or Bluetooth mode. On USB if it doesn't connect reboot the microcontroller without disconnect. If it doesn't work either, [reset pico's flash](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html#resetting-flash-memory). 
 
 - On Bluetooth if it doesn't connect on first, reboot and put your gamepad on pair mode.
 
@@ -144,6 +153,8 @@ Controllers that was tested on different host modes.
 - [lurk101](https://github.com/lurk101/pico-ps2kbd) for Keyboard PS/2 example.
 - [dotcypress](https://github.com/dotcypress/ula) for the Logic Analyzer compatible with PulseView. Was very useful for PS1 controller part.
 - [usedbytes](https://github.com/usedbytes/picow_ds4) for ps4 bluetooth example.
+- [dangiu](https://github.com/dangiu/PicoMemcard) for `psxSPI.pio` program from PicoMemcard project.
+- [TonyMacDonald1995](https://github.com/TonyMacDonald1995/DS4toPS2) for PS2 controller simulation example.
 
 
 ## License
