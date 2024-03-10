@@ -60,7 +60,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 ![keyboard_connector](./docs/keyboard_connector.jpg)
 ![keyboard_pc](./docs/keyboard_pc.jpg)
 
-- The connection for PS1 controllers are on **19 GPIO** for **COMMAND PIN**, **20 GPIO** for **CLOCK PIN**, **21 GPIO** for **ATTENTION PIN** and **22 GPIO** for **DATA PIN**
+- The connection for PS1/PS2 controllers are on **19 GPIO** for **COMMAND PIN**, **20 GPIO** for **CLOCK PIN**, **21 GPIO** for **ATTENTION PIN** and **22 GPIO** for **DATA PIN**.
 
 ![ps1_schematic](./docs/ps1_pinout.png)
 ![ps1_connector](./docs/ps1_connector.jpg)
@@ -75,6 +75,10 @@ To get started with PicoGamepadConverter, follow the steps below:
 - The connection for PS1/PS2 device mode are on **19 GPIO** for **DATA PIN**, **20 GPIO** for **COMMAND PIN**, **21 GPIO** for **ATTENTION PIN**, **22 GPIO** for **CLOCK PIN** and **26 GPIO** for **ACKNOWLEDGE PIN**.
 
 - On PS1/PS2 device mode, the host connection is on **native usb female connector on the microcontroller**.
+
+- On PS1/PS2 device mode, the alternative connection for Keyboard PS/2 are on **5 GPIO** for **DATA PIN** and **6 GPIO** for **CLOCK PIN**.
+
+- On PS1/PS2 device mode, the alternative connection for PS1/PS2 controllers are on **5 GPIO** for **COMMAND PIN**, **6 GPIO** for **CLOCK PIN**, **7 GPIO** for **ATTENTION PIN** and **8 GPIO** for **DATA PIN**.
 
 ![ps1_ps2_device_connection](./docs/PS1_PS2_pinout.png)
 

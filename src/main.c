@@ -225,6 +225,14 @@ int main(void) {
         case PSX:
             //This core is for device modes but PS1/PS2 MODE need reboot the core1
             switch(HOST){
+                case KBD_PS2:
+                    kbd_init(1, ALT_DAT_GPIO, read_keyboard);
+                    while(1){};
+                    break;
+                case PSX:
+                    psx_init(1, ALT_CMD, ALT_DAT, read_psx_controller);
+                    while(1){};
+                    break;
                 case BLUETOOTH:
 #if PICO_W
                     btstack_host(sendReportData);
