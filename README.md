@@ -144,7 +144,7 @@ Controllers that was tested on different host modes.
 _The instructions below have been successful on Windows (11) but should mostly apply to Linux_
 
 1. (windows) Install Docker Desktop
-2. Setup pico sdk environment by following https://community.element14.com/products/raspberry-pi/b/blog/posts/working-with-pi-pico-c-c-projects-easily-a-docker-approach
+2. Setup pico sdk environment by following  [this guide](https://community.element14.com/products/raspberry-pi/b/blog/posts/working-with-pi-pico-c-c-projects-easily-a-docker-approach)
 3. Open Docker Desktop
 4. Find the `pc1` container, click on `⋮` and select `Open in Terminal` then type in these commands:
 
@@ -178,8 +178,6 @@ docker cp pc1:/home/dev/pico/PicoGamepadConverter/build/PicoGamepadConverter.uf2
 cp PicoGamepadConverter.uf2 d:
 ```
 9. Start using...
-
-_You can also use VSCode to edit the container code - install the extension  `Remote Development`.  Then select the left hand icon `Remote Explorer` (this might need installing) and then select the local container.  Now you can use VS Code for editing and the terminal is in the container as well_
 
 ---
 
