@@ -139,6 +139,48 @@ Controllers that was tested on different host modes.
 
 ---
 
+### Building
+
+_The instructions below have been successful on Windows (11) but should mostly apply to Linux_
+
+1. (windows) Install Docker Desktop
+2. Setup pico sdk environment by following  [this guide](https://community.element14.com/products/raspberry-pi/b/blog/posts/working-with-pi-pico-c-c-projects-easily-a-docker-approach)
+3. Open Docker Desktop
+4. Find the `pc1` container, click on `⋮` and select `Open in Terminal` then type in these commands:
+
+```
+cd /home/dev
+mkdir pico
+cd pico
+git clone --recursive https://github.com/Loc15/PicoGamepadConverter.git
+```
+5. Wait a bit then:
+
+```
+cd PicoGamepadConverter
+mkdir build
+cd build
+cmake ../src
+```
+
+6. Wait a bit more then:
+
+```
+make
+```
+
+7. Wait some more, then reset your Pico (or other board) with BOOTSEL held down - the instructions below assume the Pico will be drive D:
+8. Open a **windows command line** (i.e. windows powershell - NOT the docker terminal) and type in:
+
+```
+cd Downloads
+docker cp pc1:/home/dev/pico/PicoGamepadConverter/build/PicoGamepadConverter.uf2 .
+cp PicoGamepadConverter.uf2 d:
+```
+9. Start using...
+
+---
+
 ### Troubleshooting
 
 - 8bitdo controllers sometimes have problems to connect on USB or Bluetooth mode. On USB if it doesn't connect reboot the microcontroller without disconnect. If it doesn't work either, [reset pico's flash](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html#resetting-flash-memory). 
