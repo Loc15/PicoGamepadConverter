@@ -37,93 +37,120 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
 
     switch(mode_host){
         case BLUETOOTH:
-    	case DINPUT:
-            uint8_t *report_hid  = report;
-            /*JOYSTICKS DATA START POSITION*/
-            uint8_t joystick_pos = report_hid[0];
-            /*COPY JOYSTICKS DATA*/
-            host_report.sThumbLX = HID_TO_XINPUT_X(report_hid[joystick_pos]);
-            host_report.sThumbLY = HID_TO_XINPUT_Y(report_hid[joystick_pos+1]);
-            host_report.sThumbRX = HID_TO_XINPUT_X(report_hid[joystick_pos+2]);
-            host_report.sThumbRY = HID_TO_XINPUT_Y(report_hid[joystick_pos+3]);
-            /*BUTTONS*/
-            uint8_t buttons1;
-            uint8_t buttons2;
-            uint8_t buttons3;
-            /*BUTTONS*/ 
-            switch(joystick_pos){
-                case LOGITECH:
-                    /*BUTTONS+DPAD*/
-                    buttons1 = report_hid[5];
-                    /*THUMBS+START+SELECT+SHOULDERS*/
-                    buttons2 = report_hid[6];
+    	case DINPUT: {
+                uint8_t *report_hid = report;
+                /*JOYSTICKS DATA START POSITION*/
+                uint8_t joystick_pos = report_hid[0];
+                /*COPY JOYSTICKS DATA*/
+                host_report.sThumbLX = HID_TO_XINPUT_X(report_hid[joystick_pos]);
+                host_report.sThumbLY = HID_TO_XINPUT_Y(report_hid[joystick_pos + 1]);
+                host_report.sThumbRX = HID_TO_XINPUT_X(report_hid[joystick_pos + 2]);
+                host_report.sThumbRY = HID_TO_XINPUT_Y(report_hid[joystick_pos + 3]);
+                /*BUTTONS*/
+                uint8_t buttons1;
+                uint8_t buttons2;
+                uint8_t buttons3;
+                /*BUTTONS*/
+                switch (joystick_pos) {
+                    case LOGITECH:
+                        /*BUTTONS+DPAD*/
+                        buttons1 = report_hid[5];
+                        /*THUMBS+START+SELECT+SHOULDERS*/
+                        buttons2 = report_hid[6];
 
-                    host_report.wButtons = LOGITECH_DPAD[buttons1 & 0xF] | (buttons1 & LOGITECH_GAMEPAD_A ? XINPUT_GAMEPAD_A : 0) |
-                                    (buttons1 & LOGITECH_GAMEPAD_B ? XINPUT_GAMEPAD_B : 0) | (buttons1 & LOGITECH_GAMEPAD_X ? XINPUT_GAMEPAD_X : 0) |
-                                    (buttons1 & LOGITECH_GAMEPAD_Y ? XINPUT_GAMEPAD_Y : 0) | (buttons2 & LOGITECH_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
-                                    (buttons2 & LOGITECH_GAMEPAD_BACK ? XINPUT_GAMEPAD_BACK : 0) | (buttons2 & LOGITECH_GAMEPAD_LEFT_SHOULDER ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
-                                    (buttons2 & LOGITECH_GAMEPAD_RIGHT_SHOULDER ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) | (buttons2 & LOGITECH_GAMEPAD_LEFT_THUMB ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
-                                    (buttons2 & LOGITECH_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_RIGHT_THUMB : 0);
-                    host_report.bLeftTrigger = ((buttons2 & LOGITECH_GAMEPAD_LEFT_TRIGGER) * 0xFF);
-                    host_report.bRightTrigger = ((buttons2 & LOGITECH_GAMEPAD_RIGHT_TRIGGER) * 0xFF);
-                    /*FALTA HOME BUTTON*/
-                    break;
-                case PS3:
-                    /*DPAD+SELECT+THUMBS+START*/
-                    buttons1 = report_hid[2];
-                    /*BUTTONS+SHOULDERS*/
-                    buttons2 = report_hid[3];
-                    /*GUIDE BUTTON*/
-                    buttons3 = report_hid[4]&0x1;
+                        host_report.wButtons =
+                                LOGITECH_DPAD[buttons1 & 0xF] | (buttons1 & LOGITECH_GAMEPAD_A ? XINPUT_GAMEPAD_A : 0) |
+                                (buttons1 & LOGITECH_GAMEPAD_B ? XINPUT_GAMEPAD_B : 0) |
+                                (buttons1 & LOGITECH_GAMEPAD_X ? XINPUT_GAMEPAD_X : 0) |
+                                (buttons1 & LOGITECH_GAMEPAD_Y ? XINPUT_GAMEPAD_Y : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_BACK ? XINPUT_GAMEPAD_BACK : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_LEFT_SHOULDER ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_RIGHT_SHOULDER ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_LEFT_THUMB ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_RIGHT_THUMB : 0);
+                        host_report.bLeftTrigger = ((buttons2 & LOGITECH_GAMEPAD_LEFT_TRIGGER) * 0xFF);
+                        host_report.bRightTrigger = ((buttons2 & LOGITECH_GAMEPAD_RIGHT_TRIGGER) * 0xFF);
+                        /*FALTA HOME BUTTON*/
+                        break;
+                    case PS3:
+                        /*DPAD+SELECT+THUMBS+START*/
+                        buttons1 = report_hid[2];
+                        /*BUTTONS+SHOULDERS*/
+                        buttons2 = report_hid[3];
+                        /*GUIDE BUTTON*/
+                        buttons3 = report_hid[4] & 0x1;
 
 
-                    host_report.wButtons = (buttons1 & PS3_GAMEPAD_DPAD_UP ? XINPUT_GAMEPAD_DPAD_UP : 0) | (buttons1 & PS3_GAMEPAD_DPAD_RIGHT ? XINPUT_GAMEPAD_DPAD_RIGHT : 0) |
-                                            (buttons1 & PS3_GAMEPAD_DPAD_DOWN ? XINPUT_GAMEPAD_DPAD_DOWN : 0) | (buttons1 & PS3_GAMEPAD_DPAD_LEFT ? XINPUT_GAMEPAD_DPAD_LEFT : 0) |
-                                            (buttons1 & PS3_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) | (buttons1 & PS3_GAMEPAD_SELECT ? XINPUT_GAMEPAD_BACK : 0) |
-                                            (buttons1 & PS3_GAMEPAD_L3 ? XINPUT_GAMEPAD_LEFT_THUMB : 0) | (buttons1 & PS3_GAMEPAD_R3? XINPUT_GAMEPAD_RIGHT_THUMB : 0) |
-                                            (buttons2 & PS3_GAMEPAD_CROSS ? XINPUT_GAMEPAD_A : 0) | (buttons2 & PS3_GAMEPAD_CIRCLE ? XINPUT_GAMEPAD_B : 0) |
-                                            (buttons2 & PS3_GAMEPAD_SQUARE ? XINPUT_GAMEPAD_X : 0) | (buttons2 & PS3_GAMEPAD_TRIANGLE ? XINPUT_GAMEPAD_A : 0) | 
-                                            (buttons2 & PS3_GAMEPAD_R1 ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) | (buttons2 & PS3_GAMEPAD_R2 ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) |
-                                            (buttons3 ? XINPUT_GAMEPAD_GUIDE : 0);
-                    host_report.bLeftTrigger = ((buttons2 & PS3_GAMEPAD_L2) * 0xFF);
-                    host_report.bRightTrigger = ((buttons2 & PS3_GAMEPAD_L1) * 0xFF);
-                    break;
-                case EIGHT_BITDO:
-                    /*BUTTONS+SHOULDERS*/
-                    buttons1 = report_hid[1];
-                    /*TRIGGER+SELECT+THUMBS+START*/
-                    buttons2 = report_hid[2];
-                    /*DPAD*/
-                    buttons3 = (report_hid[4] >> 4);
+                        host_report.wButtons = (buttons1 & PS3_GAMEPAD_DPAD_UP ? XINPUT_GAMEPAD_DPAD_UP : 0) |
+                                               (buttons1 & PS3_GAMEPAD_DPAD_RIGHT ? XINPUT_GAMEPAD_DPAD_RIGHT : 0) |
+                                               (buttons1 & PS3_GAMEPAD_DPAD_DOWN ? XINPUT_GAMEPAD_DPAD_DOWN : 0) |
+                                               (buttons1 & PS3_GAMEPAD_DPAD_LEFT ? XINPUT_GAMEPAD_DPAD_LEFT : 0) |
+                                               (buttons1 & PS3_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
+                                               (buttons1 & PS3_GAMEPAD_SELECT ? XINPUT_GAMEPAD_BACK : 0) |
+                                               (buttons1 & PS3_GAMEPAD_L3 ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
+                                               (buttons1 & PS3_GAMEPAD_R3 ? XINPUT_GAMEPAD_RIGHT_THUMB : 0) |
+                                               (buttons2 & PS3_GAMEPAD_CROSS ? XINPUT_GAMEPAD_A : 0) |
+                                               (buttons2 & PS3_GAMEPAD_CIRCLE ? XINPUT_GAMEPAD_B : 0) |
+                                               (buttons2 & PS3_GAMEPAD_SQUARE ? XINPUT_GAMEPAD_X : 0) |
+                                               (buttons2 & PS3_GAMEPAD_TRIANGLE ? XINPUT_GAMEPAD_A : 0) |
+                                               (buttons2 & PS3_GAMEPAD_R1 ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
+                                               (buttons2 & PS3_GAMEPAD_R2 ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) |
+                                               (buttons3 ? XINPUT_GAMEPAD_GUIDE : 0);
+                        host_report.bLeftTrigger = ((buttons2 & PS3_GAMEPAD_L2) * 0xFF);
+                        host_report.bRightTrigger = ((buttons2 & PS3_GAMEPAD_L1) * 0xFF);
+                        break;
+                    case EIGHT_BITDO:
+                        /*BUTTONS+SHOULDERS*/
+                        buttons1 = report_hid[1];
+                        /*TRIGGER+SELECT+THUMBS+START*/
+                        buttons2 = report_hid[2];
+                        /*DPAD*/
+                        buttons3 = (report_hid[4] >> 4);
 
-                    host_report.wButtons = LOGITECH_DPAD[buttons3 > 7 ? 8 : buttons3] | (buttons1 & EIGHT_BITDO_GAMEPAD_A ? XINPUT_GAMEPAD_A : 0) |
-                                    (buttons1 & EIGHT_BITDO_GAMEPAD_B ? XINPUT_GAMEPAD_B : 0) | (buttons1 & EIGHT_BITDO_GAMEPAD_X ? XINPUT_GAMEPAD_X : 0) |
-                                    (buttons1 & EIGHT_BITDO_GAMEPAD_Y ? XINPUT_GAMEPAD_Y : 0) | (buttons2 & EIGHT_BITDO_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
-                                    (buttons2 & EIGHT_BITDO_GAMEPAD_BACK ? XINPUT_GAMEPAD_BACK : 0) | (buttons1 & EIGHT_BITDO_GAMEPAD_LEFT_SHOULDER ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
-                                    (buttons1 & EIGHT_BITDO_GAMEPAD_RIGHT_SHOULDER ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) | (buttons2 & EIGHT_BITDO_GAMEPAD_LEFT_THUMB ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
-                                    (buttons2 & EIGHT_BITDO_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_RIGHT_THUMB : 0);
-                    host_report.bLeftTrigger = report_hid[10];
-                    host_report.bRightTrigger = report_hid[9];
-                    break;
-                case PS4:
-                    /*BUTTONS+DPAD*/
-                    buttons1 = report_hid[1];
-                    /*THUMBS+START+SELECT+SHOULDERS*/
-                    buttons2 = report_hid[6];
-                    /*GUIDE BUTTON*/
-                    buttons3 = report_hid[7]&0x1;
+                        host_report.wButtons = LOGITECH_DPAD[buttons3 > 7 ? 8 : buttons3] |
+                                               (buttons1 & EIGHT_BITDO_GAMEPAD_A ? XINPUT_GAMEPAD_A : 0) |
+                                               (buttons1 & EIGHT_BITDO_GAMEPAD_B ? XINPUT_GAMEPAD_B : 0) |
+                                               (buttons1 & EIGHT_BITDO_GAMEPAD_X ? XINPUT_GAMEPAD_X : 0) |
+                                               (buttons1 & EIGHT_BITDO_GAMEPAD_Y ? XINPUT_GAMEPAD_Y : 0) |
+                                               (buttons2 & EIGHT_BITDO_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
+                                               (buttons2 & EIGHT_BITDO_GAMEPAD_BACK ? XINPUT_GAMEPAD_BACK : 0) |
+                                               (buttons1 & EIGHT_BITDO_GAMEPAD_LEFT_SHOULDER ? XINPUT_GAMEPAD_LEFT_SHOULDER
+                                                                                             : 0) |
+                                               (buttons1 & EIGHT_BITDO_GAMEPAD_RIGHT_SHOULDER
+                                                ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) |
+                                               (buttons2 & EIGHT_BITDO_GAMEPAD_LEFT_THUMB ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
+                                               (buttons2 & EIGHT_BITDO_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_RIGHT_THUMB
+                                                                                           : 0);
+                        host_report.bLeftTrigger = report_hid[10];
+                        host_report.bRightTrigger = report_hid[9];
+                        break;
+                    case PS4:
+                        /*BUTTONS+DPAD*/
+                        buttons1 = report_hid[1];
+                        /*THUMBS+START+SELECT+SHOULDERS*/
+                        buttons2 = report_hid[6];
+                        /*GUIDE BUTTON*/
+                        buttons3 = report_hid[7] & 0x1;
 
-                    host_report.wButtons = LOGITECH_DPAD[buttons1 & 0xF] | (buttons1 & LOGITECH_GAMEPAD_A ? XINPUT_GAMEPAD_A : 0) |
-                                    (buttons1 & LOGITECH_GAMEPAD_B ? XINPUT_GAMEPAD_B : 0) | (buttons1 & LOGITECH_GAMEPAD_X ? XINPUT_GAMEPAD_X : 0) |
-                                    (buttons1 & LOGITECH_GAMEPAD_Y ? XINPUT_GAMEPAD_Y : 0) | (buttons2 & LOGITECH_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
-                                    (buttons2 & LOGITECH_GAMEPAD_BACK ? XINPUT_GAMEPAD_BACK : 0) | (buttons2 & LOGITECH_GAMEPAD_LEFT_SHOULDER ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
-                                    (buttons2 & LOGITECH_GAMEPAD_RIGHT_SHOULDER ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) | (buttons2 & LOGITECH_GAMEPAD_LEFT_THUMB ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
-                                    (buttons2 & LOGITECH_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_RIGHT_THUMB : 0) | (buttons3 ? XINPUT_GAMEPAD_GUIDE : 0);
-                    host_report.bLeftTrigger = report_hid[8];
-                    host_report.bRightTrigger = report_hid[9];
-                    break;
-            default:
-                break;
+                        host_report.wButtons =
+                                LOGITECH_DPAD[buttons1 & 0xF] | (buttons1 & LOGITECH_GAMEPAD_A ? XINPUT_GAMEPAD_A : 0) |
+                                (buttons1 & LOGITECH_GAMEPAD_B ? XINPUT_GAMEPAD_B : 0) |
+                                (buttons1 & LOGITECH_GAMEPAD_X ? XINPUT_GAMEPAD_X : 0) |
+                                (buttons1 & LOGITECH_GAMEPAD_Y ? XINPUT_GAMEPAD_Y : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_START ? XINPUT_GAMEPAD_START : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_BACK ? XINPUT_GAMEPAD_BACK : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_LEFT_SHOULDER ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_RIGHT_SHOULDER ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_LEFT_THUMB ? XINPUT_GAMEPAD_LEFT_THUMB : 0) |
+                                (buttons2 & LOGITECH_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_RIGHT_THUMB : 0) |
+                                (buttons3 ? XINPUT_GAMEPAD_GUIDE : 0);
+                        host_report.bLeftTrigger = report_hid[8];
+                        host_report.bRightTrigger = report_hid[9];
+                        break;
+                    default:
+                        break;
+                }
             }
             break;   
         case KBD_PS2:
@@ -139,33 +166,41 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
             host_report.bLeftTrigger = (KEYBOARD_MASK_REVERSE(*(uint32_t*)report, 24) * 0xFF);
             host_report.bRightTrigger = (KEYBOARD_MASK_REVERSE(*(uint32_t*)report, 25) * 0xFF);
             break;
-        case PSX:
-            uint32_t *psx_data = report;
-            /*COPY DATA BUTTONS [3] AND [4]*/
-            host_report.wButtons = (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_DPAD_UP ? 0 : XINPUT_GAMEPAD_DPAD_UP) | ((DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_DPAD_RIGHT ? 0 : XINPUT_GAMEPAD_DPAD_RIGHT)) |
-                                    (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_DPAD_DOWN ? 0 : XINPUT_GAMEPAD_DPAD_DOWN) | (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_DPAD_LEFT ? 0 : XINPUT_GAMEPAD_DPAD_LEFT) |
-                                    (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_START ? 0 : XINPUT_GAMEPAD_START) | (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_SELECT ? 0 : XINPUT_GAMEPAD_BACK) |
-                                    (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_R3 ? 0 : XINPUT_GAMEPAD_RIGHT_THUMB) | (DATA_SHIFT(psx_data[3])&PSX_GAMEPAD_L3 ? 0 : XINPUT_GAMEPAD_LEFT_THUMB) |
-                                    (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_R1 ? 0 : XINPUT_GAMEPAD_RIGHT_SHOULDER) | (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_L1 ? 0 : XINPUT_GAMEPAD_LEFT_SHOULDER) |
-                                    (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_TRIANGLE ? 0 : XINPUT_GAMEPAD_Y) | (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_CIRCLE ? 0 : XINPUT_GAMEPAD_B) |
-                                    (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_CROSS ? 0 : XINPUT_GAMEPAD_A) | (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_SQUARE ? 0 : XINPUT_GAMEPAD_X);
-            /*COPY JOYSTICKS DATA*/
-            /*IS CONTROLLER MODE DIGITAL?*/
-            if(DATA_SHIFT(psx_data[1]) == 0X41){
-                host_report.sThumbLX = 0;
-                host_report.sThumbLY = 0;
-                host_report.sThumbRX = 0;
-                host_report.sThumbRY = 0;
+        case PSX: {
+                uint32_t * psx_data = report;
+                /*COPY DATA BUTTONS [3] AND [4]*/
+                host_report.wButtons = (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_DPAD_UP ? 0 : XINPUT_GAMEPAD_DPAD_UP) |
+                                       ((DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_DPAD_RIGHT ? 0
+                                                                                          : XINPUT_GAMEPAD_DPAD_RIGHT)) |
+                                       (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_DPAD_DOWN ? 0 : XINPUT_GAMEPAD_DPAD_DOWN) |
+                                       (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_DPAD_LEFT ? 0 : XINPUT_GAMEPAD_DPAD_LEFT) |
+                                       (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_START ? 0 : XINPUT_GAMEPAD_START) |
+                                       (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_SELECT ? 0 : XINPUT_GAMEPAD_BACK) |
+                                       (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_R3 ? 0 : XINPUT_GAMEPAD_RIGHT_THUMB) |
+                                       (DATA_SHIFT(psx_data[3]) & PSX_GAMEPAD_L3 ? 0 : XINPUT_GAMEPAD_LEFT_THUMB) |
+                                       (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_R1 ? 0 : XINPUT_GAMEPAD_RIGHT_SHOULDER) |
+                                       (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_L1 ? 0 : XINPUT_GAMEPAD_LEFT_SHOULDER) |
+                                       (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_TRIANGLE ? 0 : XINPUT_GAMEPAD_Y) |
+                                       (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_CIRCLE ? 0 : XINPUT_GAMEPAD_B) |
+                                       (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_CROSS ? 0 : XINPUT_GAMEPAD_A) |
+                                       (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_SQUARE ? 0 : XINPUT_GAMEPAD_X);
+                /*COPY JOYSTICKS DATA*/
+                /*IS CONTROLLER MODE DIGITAL?*/
+                if (DATA_SHIFT(psx_data[1]) == 0X41) {
+                    host_report.sThumbLX = 0;
+                    host_report.sThumbLY = 0;
+                    host_report.sThumbRX = 0;
+                    host_report.sThumbRY = 0;
+                } else {
+                    host_report.sThumbLX = HID_TO_XINPUT_X(DATA_SHIFT(psx_data[7]));
+                    host_report.sThumbLY = HID_TO_XINPUT_Y(DATA_SHIFT(psx_data[8]));
+                    host_report.sThumbRX = HID_TO_XINPUT_X(DATA_SHIFT(psx_data[5]));
+                    host_report.sThumbRY = HID_TO_XINPUT_Y(DATA_SHIFT(psx_data[6]));
+                }
+                /*TRIGGERS*/
+                host_report.bLeftTrigger = (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_L2 ? 0 : 0xFF);
+                host_report.bRightTrigger = (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_R2 ? 0 : 0xFF);
             }
-            else{
-                host_report.sThumbLX = HID_TO_XINPUT_X(DATA_SHIFT(psx_data[7]));
-                host_report.sThumbLY = HID_TO_XINPUT_Y(DATA_SHIFT(psx_data[8]));
-                host_report.sThumbRX = HID_TO_XINPUT_X(DATA_SHIFT(psx_data[5]));
-                host_report.sThumbRY = HID_TO_XINPUT_Y(DATA_SHIFT(psx_data[6]));
-            }
-            /*TRIGGERS*/
-            host_report.bLeftTrigger = (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_L2 ? 0 : 0xFF);
-            host_report.bRightTrigger = (DATA_SHIFT(psx_data[4])&PSX_GAMEPAD_R2 ? 0 : 0xFF);
             break;
         default:
             /*XINPUT*/
