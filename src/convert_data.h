@@ -5,6 +5,7 @@ typedef enum {
     KBD_PS2,
     PSX,
     BLUETOOTH,
+    WII,
     WEB
 } MODE;
 

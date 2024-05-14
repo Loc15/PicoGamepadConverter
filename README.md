@@ -10,7 +10,7 @@ PicoGamepadCoverter is a project designed for RP2040 or Raspberry Pi Pico and va
 - Read input from USB and Bluetooth controllers.
 - Read inputs from no USB peripherals.
 - Web interface to choose between modes.
-- Different out modes (Dinput, Xinput, Switch, Bluetooth, PS1/PS2)
+- Different out modes (Dinput, Xinput, Switch, Bluetooth, PS1/PS2, WII)
 - Easy to use, no overcomplicated options.
 
 ---
@@ -43,16 +43,19 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 ![web_mode](./docs/web_configurator.png)
 
-5. Connect your gamepad, when it connected successfully the led on the board gonna turn on.
+5. Connect your gamepad, when it connected successfully the LED on the board gonna turn on.
 
 6. Enjoy!
 
 
-### Additional information
+## Additional information
 
 - The LED onboard indicates that a gamepad has been mounted successfully, it works on all host modes except **Keyboard PS/2**
 
-- The additional USB female connector PINS are **16** and **17 GPIO**.  
+- The additional USB female connector PINS are **16** and **17 GPIO**. 
+
+---
+#### PS/2 KEYBOARD
 
 - The connection for Keyboard PS/2 are on **19 GPIO** for **DATA PIN** and **20 GPIO** for **CLOCK PIN**.
 
@@ -60,11 +63,8 @@ To get started with PicoGamepadConverter, follow the steps below:
 ![keyboard_connector](./docs/keyboard_connector.jpg)
 ![keyboard_pc](./docs/keyboard_pc.jpg)
 
-- The connection for PS1/PS2 controllers are on **19 GPIO** for **COMMAND PIN**, **20 GPIO** for **CLOCK PIN**, **21 GPIO** for **ATTENTION PIN** and **22 GPIO** for **DATA PIN**.
-
-![ps1_schematic](./docs/ps1_pinout.png)
-![ps1_connector](./docs/ps1_connector.jpg)
-![ps1_pc](./docs/ps1_pc.jpg)
+---
+#### BLUETOOTH
 
 - Bluetooth modes only works on Pico W.
 
@@ -72,15 +72,40 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 - On Bluetooth host mode you must put the mac address of your gamepad. You can get this address connecting you gamepad to a PC or a mobile phone. This address _should_ be put just once time, next time you just need choose the mode.
 
+---
+
+#### WII
+
+- If the LED blinks means that microcontroller not is connected still.
+
+- If the LED is solid on means that it is connected.
+
+- To connect to wii console you need press sync button.
+
+- It doesn't work on homebrew application for now. Still you can play wii games via homebrew, just open the game on a loader and on game try to sync.
+
+- You can change between wiimote and classic controller pressing **X** and **Y** (Xbox layout) at the same time.
+
+- For controllers without **guide button** the home button is right thumbstick button.
+
+---
+#### PS1/PS2
+
+- The connection for PS1/PS2 controllers (host mode) are on **19 GPIO** for **COMMAND PIN**, **20 GPIO** for **CLOCK PIN**, **21 GPIO** for **ATTENTION PIN** and **22 GPIO** for **DATA PIN**.
+
+![ps1_schematic](./docs/ps1_pinout.png)
+![ps1_connector](./docs/ps1_connector.jpg)
+![ps1_pc](./docs/ps1_pc.jpg)
+
 - The connection for PS1/PS2 device mode are on **19 GPIO** for **DATA PIN**, **20 GPIO** for **COMMAND PIN**, **21 GPIO** for **ATTENTION PIN**, **22 GPIO** for **CLOCK PIN** and **26 GPIO** for **ACKNOWLEDGE PIN**.
+
+![ps1_ps2_device_connection](./docs/PS1_PS2_pinout.png)
 
 - On PS1/PS2 device mode, the host connection is on **native usb female connector on the microcontroller**.
 
 - On PS1/PS2 device mode, the alternative connection for Keyboard PS/2 are on **5 GPIO** for **DATA PIN** and **6 GPIO** for **CLOCK PIN**.
 
 - On PS1/PS2 device mode, the alternative connection for PS1/PS2 controllers are on **5 GPIO** for **COMMAND PIN**, **6 GPIO** for **CLOCK PIN**, **7 GPIO** for **ATTENTION PIN** and **8 GPIO** for **DATA PIN**.
-
-![ps1_ps2_device_connection](./docs/PS1_PS2_pinout.png)
 
 ---
 ## Modes
@@ -100,15 +125,16 @@ Exist two parameter to choose on web interface, **host** and **device**. The fir
 
  ### DEVICE
  #### USB MODES
- - Xinput: Simulation of Xinput gamepad controllers (doesn't work on consoles, only on PC).
-- Dinput: Simulation of a generic HID gamepad.
-- Switch: Simulation of Switch Pro controller.
+ - Xinput: Emulation of Xinput gamepad controllers (doesn't work on consoles, only on PC).
+- Dinput: Emulation of a generic HID gamepad.
+- Switch: Emulation of Switch Pro controller.
 
 #### Wireless MODES
-- Bluetooth: Simulation of a generic HID gamepad.
+- Bluetooth: Emulation of a generic HID gamepad.
+- Wii: Emulation of a Wiimote with Classic controller.
 
 #### SPECIAL MODES
-- PS1/PS2: Simulation of a PS1 or PS2 controller.
+- PS1/PS2: Emulation of a PS1 or PS2 controller.
 
 ---
 ## Features
@@ -117,9 +143,9 @@ You can to set some additional configuration if you required:
 
 ![features](./docs/features.png)
 
-- Block analogs.
-- Swap Dpap and Left analog.
-- Add deadzone to analogs.
+- **Block analogs** -> Disable the analog stick and keeping it on center.
+- **Swap Dpad and Left analog.**
+- **Add deadzone to analogs.**
 
 ---
 
@@ -181,17 +207,17 @@ cp PicoGamepadConverter.uf2 d:
 
 ---
 
-### Troubleshooting
+## Troubleshooting
 
-- 8bitdo controllers sometimes have problems to connect on USB or Bluetooth mode. On USB if it doesn't connect reboot the microcontroller without disconnect. If it doesn't work either, [reset pico's flash](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html#resetting-flash-memory). 
-
-- On Bluetooth if it doesn't connect on first, reboot and put your gamepad on pair mode.
+- On Bluetooth host mode if it doesn't connect on first, reboot and put your gamepad on pair mode.
+- If it fails multiple times to connect on any bluetooth mode [reset the pico's flash](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html#resetting-flash-memory).
 
 ---
 ## Acknowledgments
 
 - [TinyUSB](https://github.com/hathach/tinyusb) USB stack.
 - [Pico-PIO-USB](https://github.com/sekigon-gonnoc/Pico-PIO-USB/issues) USB host/device implementation using PIO.
+- [btstack](https://github.com/bluekitchen/btstack) Dual-mode Bluetooth stack.
 - [GP2040-CE](https://github.com/OpenStickCommunity/GP2040-CE) for switch descriptor and inspiration in general. It's a great project.
 - [Ryzee119](https://github.com/Ryzee119/tusb_xinput) for TinyUSB xinput host driver.
 - [fluffymadness](https://github.com/fluffymadness/tinyusb-xinput) for xinput device example.
@@ -201,6 +227,7 @@ cp PicoGamepadConverter.uf2 d:
 - [usedbytes](https://github.com/usedbytes/picow_ds4) for ps4 bluetooth example.
 - [dangiu](https://github.com/dangiu/PicoMemcard) for `psxSPI.pio` program from PicoMemcard project.
 - [TonyMacDonald1995](https://github.com/TonyMacDonald1995/DS4toPS2) for PS2 controller simulation example.
+- [rnconrad](https://github.com/rnconrad/WiimoteEmulator) for the wiimote emulator project.
 
 
 ## License

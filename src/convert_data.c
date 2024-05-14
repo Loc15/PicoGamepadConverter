@@ -5,6 +5,7 @@
 #include "SwitchDescriptors.h"
 #include "PS3_Descriptors.h"
 #include "controller_simulator.h"
+#include "wiimote.h"
 //Host
 #include "xinput_definitions.h"
 #include "hid_definitions.h"
@@ -22,6 +23,10 @@
 
 #define KEYBOARD_MASK_REVERSE(a,b)    ((a >> b)&1)
 
+#define XINPUT_TO_WIIMOTE(a) ((a>>8))
+#define XINPUT_TO_CLASSIC_X(a) ((a>>10) + 32)
+#define XINPUT_TO_CLASSIC_Y(a) ((a>>11) + 32)
+
 /*XINPUT TO SWITCH*/
 const uint8_t SWITCH_DEVICE_HAT[] = {SWITCH_HAT_NOTHING, SWITCH_HAT_UP, SWITCH_HAT_DOWN, SWITCH_HAT_NOTHING, SWITCH_HAT_LEFT, 
                                 SWITCH_HAT_UPLEFT, SWITCH_HAT_DOWNLEFT, SWITCH_HAT_NOTHING, SWITCH_HAT_RIGHT, 
@@ -32,6 +37,9 @@ void set_features(xinput_gamepad_t *host_report);
 
 
 void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_device){
+
+    // For wii case
+    uint8_t guide_button = 0;
     
     xinput_gamepad_t host_report;
 
@@ -99,6 +107,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                                                (buttons3 ? XINPUT_GAMEPAD_GUIDE : 0);
                         host_report.bLeftTrigger = ((buttons2 & PS3_GAMEPAD_L2) * 0xFF);
                         host_report.bRightTrigger = ((buttons2 & PS3_GAMEPAD_L1) * 0xFF);
+
+                        guide_button = 1;
                         break;
                     case EIGHT_BITDO:
                         /*BUTTONS+SHOULDERS*/
@@ -147,6 +157,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                                 (buttons3 ? XINPUT_GAMEPAD_GUIDE : 0);
                         host_report.bLeftTrigger = report_hid[8];
                         host_report.bRightTrigger = report_hid[9];
+
+                        guide_button = 1;
                         break;
                     default:
                         break;
@@ -165,6 +177,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
 
             host_report.bLeftTrigger = (KEYBOARD_MASK_REVERSE(*(uint32_t*)report, 24) * 0xFF);
             host_report.bRightTrigger = (KEYBOARD_MASK_REVERSE(*(uint32_t*)report, 25) * 0xFF);
+
+            guide_button = 1;
             break;
         case PSX: {
                 uint32_t * psx_data = report;
@@ -284,7 +298,85 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
             device_report->l2 = host_report.bLeftTrigger;
             device_report->r2 = host_report.bRightTrigger;
         }
-        break;
+            break;
+        case WII:{
+            WiimoteReport *device_report = new_report;
+
+            // No guide button for some controllers then using right thumbstick
+            if((mode_host != XINPUT) || (!guide_button)){
+                host_report.wButtons |= (host_report.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_GUIDE : 0);
+            }
+
+            //wiimote or classic
+            switch(device_report->mode){
+                case 0:
+                    /*new data*/
+                    device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_B;
+                    device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->wiimote.minus = host_report.wButtons & XINPUT_GAMEPAD_BACK;
+                    device_report->wiimote.plus = host_report.wButtons & XINPUT_GAMEPAD_START;
+                    device_report->wiimote.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
+                    device_report->wiimote.one = host_report.wButtons & XINPUT_GAMEPAD_X;
+                    device_report->wiimote.two = host_report.wButtons & XINPUT_GAMEPAD_Y;
+                    device_report->wiimote.up = host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP;
+                    device_report->wiimote.down = host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
+                    device_report->wiimote.left = host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
+                    device_report->wiimote.right = host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
+                    device_report->wiimote.ir_x = XINPUT_TO_WIIMOTE(host_report.sThumbLX);
+                    device_report->wiimote.ir_y = XINPUT_TO_WIIMOTE(host_report.sThumbLY);
+
+                    /*check if it wanna change the mode*/
+                    if(device_report->wiimote.one & device_report->wiimote.two){
+                        device_report->switch_mode = 1;
+                    }
+                        /*wait to change to zero*/
+                    else{
+                        if(device_report->switch_mode){
+                            device_report->mode = 1;
+                            device_report->switch_mode = 0;
+                        }
+                    }
+                    break;
+                case 1:
+                    /*new data*/
+                    device_report->classic.a = host_report.wButtons & XINPUT_GAMEPAD_B;
+                    device_report->classic.b = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->classic.x = host_report.wButtons & XINPUT_GAMEPAD_Y;
+                    device_report->classic.y = host_report.wButtons & XINPUT_GAMEPAD_X;
+                    device_report->classic.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
+                    device_report->classic.minus = host_report.wButtons & XINPUT_GAMEPAD_BACK;
+                    device_report->classic.plus = host_report.wButtons & XINPUT_GAMEPAD_START;
+                    device_report->classic.up = host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP;
+                    device_report->classic.down = host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
+                    device_report->classic.left = host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
+                    device_report->classic.right = host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
+                    device_report->classic.lz = host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER;
+                    device_report->classic.rz = host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
+                    device_report->classic.lt = host_report.bLeftTrigger;
+                    device_report->classic.rt = host_report.bRightTrigger;
+                    device_report->classic.ltrigger = (host_report.bLeftTrigger > 32 ? 1: 0);         //digital button of lt
+                    device_report->classic.rtrigger = (host_report.bRightTrigger > 32 ? 1 : 0);        //digital button of rt
+                    device_report->classic.ls_x = XINPUT_TO_CLASSIC_X(host_report.sThumbLX);
+                    device_report->classic.ls_y = XINPUT_TO_CLASSIC_Y(host_report.sThumbLY);
+
+                    /*check if it wants change the mode*/
+                    if(device_report->classic.x & device_report->classic.y){
+                        device_report->switch_mode = 1;
+                    }
+                        /*wait to change to zero*/
+                    else{
+                        if(device_report->switch_mode){
+                            device_report->mode = 0;
+                            device_report->switch_mode = 0;
+                            device_report->reset_ir = 1;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+            break;  
         default:
             /*XINPUT*/
             //diferent structure host -> device

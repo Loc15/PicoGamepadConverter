@@ -16,6 +16,8 @@
 #if PICO_W
 
 #include "blue_hid.h"
+#include "wiimote.h"
+#include "wiimote_btstack.h"
 
 #endif
 
@@ -114,6 +116,13 @@ static PSXInputState psxReport = {
         .r2 = 0x00
 };
 
+static WiimoteReport wiimote_report = {
+        .wiimote = {0},
+        .classic = {0},
+        .switch_mode = 0,
+        .mode = 0
+};
+
 /*------------- MAIN -------------*/
 
 // core1: handle host events
@@ -132,7 +141,7 @@ void core1_main() {
             break;
         case BLUETOOTH:
             //It can't have input and output bluetooth simultaneously
-            if (DEVICE == BLUETOOTH) {
+            if ((DEVICE == BLUETOOTH) || (DEVICE == WII)) {
                 return;
             }
 #if PICO_W
@@ -141,6 +150,7 @@ void core1_main() {
             break;
         default:
             switch (DEVICE) {
+                case WII:
                 case BLUETOOTH:
                     //Wifi chip use pio, that cause problems
                     //init host stack for native usb (roothub port0)
@@ -172,7 +182,7 @@ void core1_main() {
 
 // core0: handle device events
 int main(void) {
-    // default 125MHz is not appropreate. Sysclock should be multiple of 12MHz.
+    // default 125MHz is not appropriate. Sysclock should be multiple of 12MHz.
     set_sys_clock_khz(240000, true);
 
     stdio_init_all();
@@ -182,9 +192,9 @@ int main(void) {
 
     /*READ MODES FROM FLASH*/
     uint8_t read_value = read_flash(0);
-    HOST = read_value > 5 ? 0 : read_value;
+    HOST = read_value > 6 ? 0 : read_value;
     read_value = read_flash(1);
-    DEVICE = read_value > 5 ? 0 : read_value;
+    DEVICE = read_value > 6 ? 0 : read_value;
 
     printf("MODE HOST -> %d | MODE DEVICE -> %d\n", HOST, DEVICE);
 
@@ -221,6 +231,14 @@ int main(void) {
         case BLUETOOTH:
 #if PICO_W
             btstack_hid(&switchReport);
+#endif
+            break;
+#if PICO_W
+        case WII:
+            // Set led functions
+            wiimote_emulator_set_led(led_on, led_off);
+            // Wiimote emulator
+            wiimote_emulator(&wiimote_report);
 #endif
             break;
         case PSX:
@@ -346,6 +364,9 @@ static void sendReportData(void *original_data) {
             break;
         case PSX:
             new_report_fun(original_data, HOST, &psxReport, PSX);
+            break;
+        case WII:
+            new_report_fun(original_data, HOST, &wiimote_report, WII);
             break;
         default:
             break;
