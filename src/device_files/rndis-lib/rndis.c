@@ -128,6 +128,28 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
         watchdog_reboot(0, SRAM_END, 2000); 
       }
     }
+    else if(mg_http_match_uri(hm, "/read_data")){
+      uint8_t buffer[256];
+      for (int i = 0; i < 27; ++i)
+      {
+        // Void wrong data
+        buffer[i] = (read_flash(i) == 0xff ? 0 : read_flash(i));
+      }
+      // Array to string
+      uint8_t size = 27;
+      uint8_t path[size*3];
+      uint8_t offset = 0;
+      path[0] = '[';
+      for(int i = 0; i < size; i++){
+        sprintf(&path[1 + offset],"%d,", buffer[i]);
+        // strlen don't work
+        for (int j = 0; path[j] != '\0'; j++) {
+            offset = j;
+        }
+      }
+      path[offset] = ']';
+      mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", path);
+    }
     else {                                                // For all other URIs,
       struct mg_http_serve_opts opts = {.root_dir = dir_web_files, .fs = &mg_fs_packed};
       mg_http_serve_dir(c, hm, &opts);                      // From root_dir

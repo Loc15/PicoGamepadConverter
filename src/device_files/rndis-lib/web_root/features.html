@@ -150,9 +150,65 @@ let enable_deadzone = document.getElementById("Deadzone");
 let dead_zone_childs = document.getElementsByClassName("slider_box");
 const set_features = document.getElementById("save_features");
 
-
 //remove options because I can't disable hahaha
 option_box_div.remove();
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Get the saved data
+    fetch('/read_data', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(function (response) {
+        if(response.ok){
+            response.json().then(function (response){
+                // Set the data read
+                if(response[9]){
+                    enable_features.checked = true;
+                    // Show the other options
+                    body.insertBefore(option_box_div_copy, enable_switch.parentNode.nextSibling);
+                    option_box_div = option_box_div_copy;
+                    let feature;
+                    for(let i = 0; i < response[10]; i++){
+                        feature = response[11 + i];
+                        switch (feature){
+                            case value_of_features["Block Analog"]:
+                                if(response[19]&0x1){
+                                    const block_L = document.getElementById("block_L");
+                                    block_L.checked = true;
+                                }
+                                if((response[19]>>1)&0x1){
+                                    const block_R = document.getElementById("block_R");
+                                    block_R.checked = true;
+                                }
+                                break;
+                            case value_of_features["Swap Dpad"]:
+                                const swap_dpad_f = document.getElementById("Swap Dpad");
+                                swap_dpad_f.checked = true;
+                                break;
+                            case value_of_features["Deadzone"]:
+                                if((response[20] >> 7)&0x1){
+                                    const dead_zone_L = document.getElementById("Deadzone_L");
+                                    dead_zone_L.checked = true;
+                                    const slider_L = document.getElementById("slider_left");
+                                    slider_L.value = response[20]&0x7F;
+                                }
+                                if((response[21] >> 7)&0x1){
+                                    const dead_zone_R = document.getElementById("Deadzone_R");
+                                    dead_zone_R.checked = true;
+                                    const slider_R = document.getElementById("slider_right");
+                                    slider_R.value = response[21]&0x7F;
+                                }
+                                break;
+                        }
+                    }
+                }
+            });
+        }
+    }).catch(err => console.log(err));
+});
 
 enable_switch.onchange = function () {
     if(enable_switch.checked){
@@ -196,6 +252,7 @@ function get_features(){
             }
             send_features["data"][0] = block;
         }
+
         const swap_dpad_f = document.getElementById("Swap Dpad");
         if(swap_dpad_f.checked){
             send_features["features"][counter + 2] = value_of_features["Swap Dpad"];

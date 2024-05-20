@@ -137,6 +137,39 @@ const hostOption = document.getElementById('host');
 let bluetooth_select = false;
 const parentNode = sendButton.parentNode;
 
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Get the saved data
+    fetch('/read_data', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(function (response) {
+        if(response.ok){
+            response.json().then(function (response){
+                // Set the data read
+                hostOption.value = getKeyByValue(value_of_options, response[0]);
+                deviceOption.value = getKeyByValue(value_of_options, response[1]);
+                if(hostOption.value === 'Bluetooth'){
+                    bluetooth_select = true;
+                    bluetoothOptions();
+                    const selectBluetooth = document.getElementById('blue_hid');
+                    selectBluetooth.value = getKeyByValue(bluetooth_hid_options, response[8]);
+                    const macBluetooth = document.getElementById('mac_input');
+                    macBluetooth.value = response.slice(2, 8).map(function (number) {
+                        return number.toString(16);
+                    }).toString().toUpperCase().replaceAll(',', ':');
+                }
+            });
+        }
+    }).catch(err => console.log(err));
+});
+
 function bluetoothOptions() {
     const new_options = document.createElement('div');
     new_options.className = "div_bluetooth";
