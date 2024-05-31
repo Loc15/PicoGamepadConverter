@@ -116,6 +116,7 @@ static PSXInputState psxReport = {
         .r2 = 0x00
 };
 
+#if PICO_W
 static WiimoteReport wiimote_report = {
         .wiimote = {0},
         .nunchuk = {0},
@@ -125,6 +126,7 @@ static WiimoteReport wiimote_report = {
         .fake_motion = 0,
         .center_accel = 0
 };
+#endif
 
 /*------------- MAIN -------------*/
 
@@ -236,8 +238,8 @@ int main(void) {
             btstack_hid(&switchReport);
 #endif
             break;
-#if PICO_W
         case WII:
+#if PICO_W
             // Set led functions
             wiimote_emulator_set_led(led_on, led_off);
             // Wiimote emulator
@@ -369,7 +371,9 @@ static void sendReportData(void *original_data) {
             new_report_fun(original_data, HOST, &psxReport, PSX);
             break;
         case WII:
+#if PICO_W
             new_report_fun(original_data, HOST, &wiimote_report, WII);
+#endif
             break;
         default:
             break;

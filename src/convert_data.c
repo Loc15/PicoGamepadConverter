@@ -5,7 +5,9 @@
 #include "SwitchDescriptors.h"
 #include "PS3_Descriptors.h"
 #include "controller_simulator.h"
-#include "wiimote.h"
+#if PICO_W
+    #include "wiimote.h"
+#endif
 //Host
 #include "xinput_definitions.h"
 #include "hid_definitions.h"
@@ -23,9 +25,11 @@
 
 #define KEYBOARD_MASK_REVERSE(a,b)    ((a >> b)&1)
 
-#define XINPUT_TO_WIIMOTE(a) ((a>>8))
-#define XINPUT_TO_CLASSIC_X(a) ((a>>10) + 32)
-#define XINPUT_TO_CLASSIC_Y(a) ((a>>11) + 32)
+#if PICO_W
+    #define XINPUT_TO_WIIMOTE(a) ((a>>8))
+    #define XINPUT_TO_CLASSIC_X(a) ((a>>10) + 32)
+    #define XINPUT_TO_CLASSIC_Y(a) ((a>>11) + 32)
+#endif
 
 /*XINPUT TO SWITCH*/
 const uint8_t SWITCH_DEVICE_HAT[] = {SWITCH_HAT_NOTHING, SWITCH_HAT_UP, SWITCH_HAT_DOWN, SWITCH_HAT_NOTHING, SWITCH_HAT_LEFT, 
@@ -300,6 +304,7 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
         }
             break;
         case WII: {
+#if PICO_W
             WiimoteReport *device_report = new_report;
 
             // No guide button for some controllers then using right thumbstick
@@ -449,6 +454,7 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                         }
                     }
             }
+#endif
         }
             break;
         default:
