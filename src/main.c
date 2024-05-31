@@ -118,9 +118,12 @@ static PSXInputState psxReport = {
 
 static WiimoteReport wiimote_report = {
         .wiimote = {0},
+        .nunchuk = {0},
         .classic = {0},
         .switch_mode = 0,
-        .mode = 0
+        .mode = NO_EXTENSION,
+        .fake_motion = 0,
+        .center_accel = 0
 };
 
 /*------------- MAIN -------------*/

@@ -299,17 +299,17 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
             device_report->r2 = host_report.bRightTrigger;
         }
             break;
-        case WII:{
+        case WII: {
             WiimoteReport *device_report = new_report;
 
             // No guide button for some controllers then using right thumbstick
-            if((mode_host != XINPUT) || (!guide_button)){
+            if ((mode_host != XINPUT) || (!guide_button)) {
                 host_report.wButtons |= (host_report.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB ? XINPUT_GAMEPAD_GUIDE : 0);
             }
 
             //wiimote or classic
-            switch(device_report->mode){
-                case 0:
+            switch (device_report->mode) {
+                case NO_EXTENSION:
                     /*new data*/
                     device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_B;
                     device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_A;
@@ -326,18 +326,95 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->wiimote.ir_y = XINPUT_TO_WIIMOTE(host_report.sThumbLY);
 
                     /*check if it wanna change the mode*/
-                    if(device_report->wiimote.one & device_report->wiimote.two){
+                    if (device_report->wiimote.one & device_report->wiimote.two) {
                         device_report->switch_mode = 1;
                     }
                         /*wait to change to zero*/
-                    else{
-                        if(device_report->switch_mode){
-                            device_report->mode = 1;
+                    else {
+                        if (device_report->switch_mode) {
+                            device_report->mode = WIIMOTE_AND_NUNCHUCK;
                             device_report->switch_mode = 0;
+                            device_report->reset_ir = 1;
                         }
                     }
                     break;
-                case 1:
+                case WIIMOTE_AND_NUNCHUCK:
+                    /*new data*/
+                    /*wiimote*/
+                    device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_B;
+                    device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->wiimote.minus = host_report.wButtons & XINPUT_GAMEPAD_BACK;
+                    device_report->wiimote.plus = host_report.wButtons & XINPUT_GAMEPAD_START;
+                    device_report->wiimote.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
+                    device_report->wiimote.one = host_report.wButtons & XINPUT_GAMEPAD_X;
+                    device_report->wiimote.two = host_report.wButtons & XINPUT_GAMEPAD_Y;
+                    device_report->wiimote.up = host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP;
+                    device_report->wiimote.down = host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
+                    device_report->wiimote.left = host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
+                    device_report->wiimote.right = host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
+                    device_report->wiimote.ir_x = XINPUT_TO_WIIMOTE(host_report.sThumbRX);
+                    device_report->wiimote.ir_y = XINPUT_TO_WIIMOTE(host_report.sThumbRY);
+
+                    /*nunchuk*/
+                    device_report->nunchuk.x = XINPUT_TO_HID_X(host_report.sThumbLX);
+                    device_report->nunchuk.y = XINPUT_TO_HID_X(host_report.sThumbLY);
+                    device_report->nunchuk.c = (host_report.bLeftTrigger > 127 ? 1 : 0);
+                    device_report->nunchuk.z = host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
+
+                    /*check if it wanna change the mode*/
+                    if (device_report->wiimote.one & device_report->wiimote.two) {
+                        device_report->switch_mode = 1;
+                    }
+                        /*wait to change to zero*/
+                    else {
+                        if (device_report->switch_mode) {
+                            device_report->mode = CLASSIC_CONTROLLER;
+                            device_report->switch_mode = 0;
+                            device_report->reset_ir = 1;
+                        }
+                    }
+
+                    // Fake motion
+                    if (host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
+
+                        device_report->fake_motion = 1;
+
+                        int8_t step = 48;
+
+                        if(device_report->wiimote.accel_x > 1000 || device_report->wiimote.accel_x < 10){
+                            step = -step;
+                        }
+
+                        // Start moving all directions
+
+                        device_report->wiimote.accel_x = step + (device_report->wiimote.accel_x & 0x3FF);
+                        device_report->nunchuk.accel_x = step + (device_report->nunchuk.accel_x & 0x3FF);
+
+                        device_report->wiimote.accel_y = step + (device_report->wiimote.accel_y & 0x3FF);
+                        device_report->nunchuk.accel_y = step + (device_report->nunchuk.accel_y & 0x3FF);
+
+                        device_report->wiimote.accel_z = step + (device_report->wiimote.accel_z & 0x3FF);
+                        device_report->nunchuk.accel_z = step + (device_report->nunchuk.accel_z & 0x3FF);
+                    } else {
+                        if (device_report->fake_motion) {
+
+                            // Set center values
+                            device_report->wiimote.accel_x += 0x82 << 2;
+                            device_report->nunchuk.accel_x += 0x82 << 2;
+
+                            device_report->wiimote.accel_y += 0x82 << 2;
+                            device_report->nunchuk.accel_y += 0x82 << 2;
+
+                            device_report->wiimote.accel_z += 0x9f << 2;
+                            device_report->nunchuk.accel_z += 0x9f << 2;
+
+                            device_report->fake_motion = 0;
+                            device_report->center_accel = 1;
+                        }
+                    }
+
+                    break;
+                case CLASSIC_CONTROLLER:
                     /*new data*/
                     device_report->classic.a = host_report.wButtons & XINPUT_GAMEPAD_B;
                     device_report->classic.b = host_report.wButtons & XINPUT_GAMEPAD_A;
@@ -354,29 +431,26 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->classic.rz = host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
                     device_report->classic.lt = host_report.bLeftTrigger;
                     device_report->classic.rt = host_report.bRightTrigger;
-                    device_report->classic.ltrigger = (host_report.bLeftTrigger > 32 ? 1: 0);         //digital button of lt
-                    device_report->classic.rtrigger = (host_report.bRightTrigger > 32 ? 1 : 0);        //digital button of rt
+                    device_report->classic.ltrigger = (host_report.bLeftTrigger > 32 ? 1 : 0);    //digital button of lt
+                    device_report->classic.rtrigger = (host_report.bRightTrigger > 32 ? 1 : 0);  //digital button of rt
                     device_report->classic.ls_x = XINPUT_TO_CLASSIC_X(host_report.sThumbLX);
                     device_report->classic.ls_y = XINPUT_TO_CLASSIC_Y(host_report.sThumbLY);
 
-                    /*check if it wants change the mode*/
-                    if(device_report->classic.x & device_report->classic.y){
+                    /*check if it wanna change the mode*/
+                    if (device_report->classic.x & device_report->classic.y) {
                         device_report->switch_mode = 1;
                     }
                         /*wait to change to zero*/
-                    else{
-                        if(device_report->switch_mode){
-                            device_report->mode = 0;
+                    else {
+                        if (device_report->switch_mode) {
+                            device_report->mode = NO_EXTENSION;
                             device_report->switch_mode = 0;
                             device_report->reset_ir = 1;
                         }
                     }
-                    break;
-                default:
-                    break;
             }
         }
-            break;  
+            break;
         default:
             /*XINPUT*/
             //diferent structure host -> device

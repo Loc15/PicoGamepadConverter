@@ -171,25 +171,39 @@ struct wiimote_buttons{
   bool left;
   bool right;
 
-  //ir
-  int8_t ir_x;
-  int8_t ir_y;
-
   //special buttons
   bool sync;
   bool power;
+
+  //accelerometer (10 bit range)
+  //0 acceleration is approximately 0x200
+  uint16_t accel_x;
+  uint16_t accel_y;
+  uint16_t accel_z;
+
+  //ir
+  int8_t ir_x;
+  int8_t ir_y;
 };
 
 
 //new adding -> wiimote + classic
 typedef struct{
   struct wiimote_buttons wiimote;
+    struct wiimote_nunchuk nunchuk;
   struct wiimote_classic classic;
   uint8_t switch_mode;
   uint8_t mode;
   uint8_t reset_ir;
+  uint8_t fake_motion;
+  uint8_t center_accel;
 }WiimoteReport;
 
+enum MODE_WIIMOTE{
+    NO_EXTENSION = 0xFF,
+    WIIMOTE_AND_NUNCHUCK = 0x00,
+    CLASSIC_CONTROLLER = 0x01
+};
 
 void wiimote_init(struct wiimote_state *state);
 void wiimote_destroy(struct wiimote_state *state);

@@ -408,11 +408,10 @@ void wiimote_emulator(void *report){
 
     // Init wiimote structure
     wiimote_init(&wiimote);
-
-    //classic for default
-    reset_input_classic(&wiimote.usr.classic);
+    
+    //No extension for default
     reset_input_ir(wiimote.usr.ir_object);
-    wiimote.usr.connected_extension_type = Classic;
+    wiimote.usr.connected_extension_type = NoExtension;
 
     // Loop control to send report
     loop_wii.process = &task_wiimote;
@@ -425,57 +424,60 @@ static void input_update_wiimote(){
 
     if(input_report->reset_ir){
         reset_input_classic(&wiimote.usr.classic);
+        reset_input_nunchuk(&wiimote.usr.nunchuk);
         reset_input_ir(wiimote.usr.ir_object);
+        // Change the extension too
+        wiimote.usr.connected_extension_type = input_report->mode;
         input_report->reset_ir = 0;
     }
 
-    if(input_report->mode){
+    switch(input_report->mode){
+        case NO_EXTENSION:{
+            float pointer_delta_x = 0, pointer_delta_y = 0;
 
-        wiimote.usr.classic.a = input_report->classic.a;
-        wiimote.usr.classic.b = input_report->classic.b;
-        wiimote.usr.classic.x = input_report->classic.y;
-        wiimote.usr.classic.y = input_report->classic.x;
-        wiimote.usr.classic.minus = input_report->classic.minus;
-        wiimote.usr.classic.plus = input_report->classic.plus;
-        wiimote.usr.classic.home = input_report->classic.home;
-        wiimote.usr.classic.up = input_report->classic.up;
-        wiimote.usr.classic.down = input_report->classic.down;
-        wiimote.usr.classic.left = input_report->classic.left;
-        wiimote.usr.classic.right = input_report->classic.right;
-        wiimote.usr.classic.lz = input_report->classic.lz;
-        wiimote.usr.classic.rz = input_report->classic.rz;
-        wiimote.usr.classic.lt = input_report->classic.lt;
-        wiimote.usr.classic.rt = input_report->classic.rt;
-        wiimote.usr.classic.ltrigger = input_report->classic.rtrigger;
-        wiimote.usr.classic.rtrigger = input_report->classic.ltrigger;
-        wiimote.usr.classic.ls_x = input_report->classic.ls_x;
-        wiimote.usr.classic.ls_y = input_report->classic.ls_y;
+            memcpy(&wiimote.usr, &input_report->wiimote, 14);
 
-    }
-    else{
+            pointer_delta_x += (input_report->wiimote.ir_x / 127.0) * 0.008;
+            pointer_delta_y += (input_report->wiimote.ir_y / 127.0) * 0.008;
 
-        float pointer_delta_x = 0, pointer_delta_y = 0;
+            pointer_x = fmax(-pointer_margin, fmin(1.0 + pointer_margin, pointer_x + pointer_delta_x));
+            pointer_y = fmax(-pointer_margin, fmin(1.0 + pointer_margin, pointer_y + pointer_delta_y));
 
-        wiimote.usr.a = input_report->wiimote.a;
-        wiimote.usr.b = input_report->wiimote.b;
-        wiimote.usr.minus = input_report->wiimote.minus;
-        wiimote.usr.plus = input_report->wiimote.plus;
-        wiimote.usr.home = input_report->wiimote.home;
-        wiimote.usr.one = input_report->wiimote.one;
-        wiimote.usr.two = input_report->wiimote.two;
-        wiimote.usr.up = input_report->wiimote.up;
-        wiimote.usr.down = input_report->wiimote.down;
-        wiimote.usr.left = input_report->wiimote.left;
-        wiimote.usr.right = input_report->wiimote.right;
+            set_motion_state(&wiimote, pointer_x, pointer_y);
+        }
+            break;
+        case WIIMOTE_AND_NUNCHUCK:{
+            // Wiimote
+            float pointer_delta_x = 0, pointer_delta_y = 0;
+            memcpy(&wiimote.usr, &input_report->wiimote, 14);
 
-        pointer_delta_x += (input_report->wiimote.ir_x / 127.0) * 0.008;
-        pointer_delta_y += (input_report->wiimote.ir_y / 127.0) * 0.008;
+            // Nunchuck
+            memcpy(&wiimote.usr.nunchuk, &input_report->nunchuk, sizeof(struct wiimote_nunchuk));
 
-        pointer_x = fmax(-pointer_margin, fmin(1.0 + pointer_margin, pointer_x + pointer_delta_x));
-        pointer_y = fmax(-pointer_margin, fmin(1.0 + pointer_margin, pointer_y + pointer_delta_y));
+            pointer_delta_x += (input_report->wiimote.ir_x / 127.0) * 0.008;
+            pointer_delta_y += (input_report->wiimote.ir_y / 127.0) * 0.008;
 
-        set_motion_state(&wiimote, pointer_x, pointer_y);
+            pointer_x = fmax(-pointer_margin, fmin(1.0 + pointer_margin, pointer_x + pointer_delta_x));
+            pointer_y = fmax(-pointer_margin, fmin(1.0 + pointer_margin, pointer_y + pointer_delta_y));
 
+            set_motion_state(&wiimote, pointer_x, pointer_y);
+
+            if(input_report->fake_motion || input_report->center_accel){
+                wiimote.usr.accel_x = input_report->wiimote.accel_x;
+                wiimote.usr.accel_y = input_report->wiimote.accel_y;
+                wiimote.usr.accel_z = input_report->wiimote.accel_z;
+
+                if(input_report->center_accel){
+                    input_report->center_accel = 0;
+                }
+            }
+        }
+            break;
+        case CLASSIC_CONTROLLER:
+            memcpy(&wiimote.usr.classic, &input_report->classic, sizeof(struct wiimote_classic));
+            break;
+        default:
+            break;
     }
     
 }

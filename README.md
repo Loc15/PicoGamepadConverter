@@ -37,7 +37,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 ![conections1](./docs/bread_board1.jpg)
 ![conections2](./docs/bread_board2.jpg)
 
-3. Go to configuration mode pressing the button on 18 GPIO on start. On web mode the led start to blink.
+3. Go to configuration mode pressing the button on 18 GPIO on start. On WEB mode the LED start to blink.
 
 4. Choose the modes on the web server. Access http://192.168.3.1 in a web browser to begin configuration.
 
@@ -76,17 +76,23 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 #### WII
 
-- If the LED blinks means that microcontroller not is connected still.
+![wii_setup](./docs/wii_setup.jpg)
 
-- If the LED is solid on means that it is connected.
+- You need go to config and set the Sensor-Bar Position on the Wii as **Above TV**.
 
 - To connect to wii console you need press sync button.
 
+- If the LED blinks means that microcontroller not is connected still. The LED bliks faster than on WEB mode.
+
+- If the LED is solid on means that it is connected.
+
 - It doesn't work on homebrew application for now. Still you can play wii games via homebrew, just open the game on a loader and on game try to sync.
 
-- You can change between wiimote and classic controller pressing **X** and **Y** (Xbox layout) at the same time.
+- You can change between modes pressing **X** and **Y** (Xbox layout) at the same time.
 
 - For controllers without **guide button** the home button is right thumbstick button.
+
+- You can simulate movement for games that require it pressing the **LB** (Xbox layout) / the left shoulder button.
 
 ---
 #### PS1/PS2
@@ -131,7 +137,7 @@ Exist two parameter to choose on web interface, **host** and **device**. The fir
 
 #### Wireless MODES
 - Bluetooth: Emulation of a generic HID gamepad.
-- Wii: Emulation of a Wiimote with Classic controller.
+- Wii: Emulation of a Wiimote, Wiimote + Nunchuk and Classic controller.
 
 #### SPECIAL MODES
 - PS1/PS2: Emulation of a PS1 or PS2 controller.
@@ -166,6 +172,20 @@ Controllers that was tested on different host modes.
 ---
 
 ### Building
+
+#### If you have set PICO SDK already
+
+```
+git clone https://github.com/Loc15/PicoGamepadConverter
+cd PicoGamepadConverter/
+cd src/
+mkdir build
+cd build
+cmake ..
+make
+```
+
+#### Else you can use a docker image
 
 _The instructions below have been successful on Windows (11) but should mostly apply to Linux_
 
@@ -216,7 +236,7 @@ cp PicoGamepadConverter.uf2 d:
 ## Acknowledgments
 
 - [TinyUSB](https://github.com/hathach/tinyusb) USB stack.
-- [Pico-PIO-USB](https://github.com/sekigon-gonnoc/Pico-PIO-USB/issues) USB host/device implementation using PIO.
+- [Pico-PIO-USB](https://github.com/sekigon-gonnoc/Pico-PIO-USB) USB host/device implementation using PIO.
 - [btstack](https://github.com/bluekitchen/btstack) Dual-mode Bluetooth stack.
 - [GP2040-CE](https://github.com/OpenStickCommunity/GP2040-CE) for switch descriptor and inspiration in general. It's a great project.
 - [Ryzee119](https://github.com/Ryzee119/tusb_xinput) for TinyUSB xinput host driver.
