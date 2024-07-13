@@ -16,6 +16,8 @@ static const char hid_device_name[] = "PicoGamepad";
 static btstack_packet_callback_registration_t hci_event_callback_registration;
 static bool connected = false;
 static uint16_t hid_cid;
+static btstack_timer_source_t led_state;
+void (*callback_led_func_b[2])();
 
 uint8_t report[50];
 
@@ -34,6 +36,18 @@ static void hid_embedded_start_gamepad(void){
     report[1] = 0x03;
 
     hid_device_request_can_send_now_event(hid_cid);
+}
+
+static void led_handler(struct btstack_timer_source *ts)
+{
+    // Invert the led
+    static uint8_t led_on = 0;
+    led_on = !led_on;
+    (*callback_led_func_b[led_on])();
+
+    // Restart timer
+    btstack_run_loop_set_timer(ts, 100);
+    btstack_run_loop_add_timer(ts);
 }
 
 static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * packet, uint16_t packet_size){
@@ -67,6 +81,10 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * pack
                             }
                             connected = true;
                             hid_cid = hid_subevent_connection_opened_get_hid_cid(packet);
+                            // Remove timer led
+                            btstack_run_loop_remove_timer(&led_state);
+                            // Set the led on
+                            (*callback_led_func_b[1])();
                             //START
                             hid_embedded_start_gamepad();
                             break;
@@ -74,6 +92,9 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * pack
                             printf("HID Disconnected\n");
                             connected = false;
                             hid_cid = 0;
+                            // Start led timer
+                            btstack_run_loop_set_timer(&led_state, 100);
+                            btstack_run_loop_add_timer(&led_state);
                             break;
                         case HID_SUBEVENT_CAN_SEND_NOW:
                             send_report();
@@ -164,4 +185,13 @@ int btstack_hid(void *bluetooth_data){
     btstack_run_loop_execute();
 
     return 0;
+}
+
+void btstack_hid_set_led(void (*led_on)(), void (*led_off)()){
+    callback_led_func_b[0] = led_off;
+    callback_led_func_b[1] = led_on;
+
+    led_state.process = &led_handler;
+    btstack_run_loop_set_timer(&led_state, 100);
+    btstack_run_loop_add_timer(&led_state);
 }

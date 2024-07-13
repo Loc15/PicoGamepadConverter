@@ -249,6 +249,9 @@ int main(void) {
     switch (DEVICE) {
         case BLUETOOTH:
 #if PICO_W
+            // Set led functions
+            btstack_hid_set_led(led_on, led_off);
+            // Bluetooth device
             btstack_hid(&bluetooth_report);
 #endif
             break;
