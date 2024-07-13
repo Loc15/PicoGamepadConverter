@@ -6,6 +6,7 @@
 #include "PS3_Descriptors.h"
 #include "controller_simulator.h"
 #if PICO_W
+    #include "bluetooth_descriptors.h"
     #include "wiimote.h"
 #endif
 //Host
@@ -454,6 +455,33 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                         }
                     }
             }
+#endif
+        }
+            break;
+        case BLUETOOTH:{
+#if PICO_W
+            BluetoothReport *device_report = new_report;
+
+            /*new data*/
+            device_report->buttons1 = (host_report.wButtons & XINPUT_GAMEPAD_A ? EIGHT_BITDO_GAMEPAD_A : 0) | (host_report.wButtons & XINPUT_GAMEPAD_B ? EIGHT_BITDO_GAMEPAD_B : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_X ? EIGHT_BITDO_GAMEPAD_X : 0) | (host_report.wButtons & XINPUT_GAMEPAD_Y ? EIGHT_BITDO_GAMEPAD_Y : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ? EIGHT_BITDO_GAMEPAD_LEFT_SHOULDER : 0) | (host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ? EIGHT_BITDO_GAMEPAD_RIGHT_SHOULDER : 0);
+
+            device_report->buttons2 = (host_report.wButtons & XINPUT_GAMEPAD_START ? EIGHT_BITDO_GAMEPAD_START : 0) | (host_report.wButtons & XINPUT_GAMEPAD_BACK ? EIGHT_BITDO_GAMEPAD_BACK : 0) |
+                                      (host_report.bLeftTrigger > 0x7F ? EIGHT_BITDO_GAMEPAD_LEFT_TRIGGER : 0) | (host_report.bRightTrigger > 0x7F ? EIGHT_BITDO_GAMEPAD_RIGHT_TRIGGER : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_LEFT_THUMB ? EIGHT_BITDO_GAMEPAD_LEFT_THUMB : 0) | (host_report.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB ? EIGHT_BITDO_GAMEPAD_RIGHT_THUMB : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_GUIDE ? EIGHT_BITDO_GAMEPAD_GUIDE : 0);
+
+            device_report->dpad = SWITCH_DEVICE_HAT[host_report.wButtons&0xF];
+
+            device_report->lx = XINPUT_TO_HID_X(host_report.sThumbLX);
+            device_report->ly = XINPUT_TO_HID_Y(host_report.sThumbLY);
+
+            device_report->rx = XINPUT_TO_HID_X(host_report.sThumbRX);
+            device_report->ry = XINPUT_TO_HID_Y(host_report.sThumbRY);
+
+            device_report->lt = host_report.bLeftTrigger;
+            device_report->rt = host_report.bRightTrigger;
 #endif
         }
             break;

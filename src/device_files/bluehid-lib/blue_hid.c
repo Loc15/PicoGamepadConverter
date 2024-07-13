@@ -7,37 +7,31 @@
 
 #include "btstack_config.h"
 #include "btstack.h"
-#include "../switch/SwitchDescriptors.h"
-#include "BtStackUtils.h"
+#include "bluetooth_descriptors.h"
 
 
 static uint8_t hid_service_buffer[700];
 static uint8_t pnp_service_buffer[200];
-static const char hid_device_name[] = "Wireless Gamepad";
+static const char hid_device_name[] = "PicoGamepad";
 static btstack_packet_callback_registration_t hci_event_callback_registration;
 static bool connected = false;
 static uint16_t hid_cid;
 
 uint8_t report[50];
 
-volatile SwitchReport *bluetooth_switch_report;
+volatile BluetoothReport *bluetooth_report;
 
 // HID Report sending
 static void send_report(){
-    memcpy(&report[2], (uint8_t *)bluetooth_switch_report, sizeof(SwitchReport));
-    hid_device_send_interrupt_message(hid_cid, report, sizeof(SwitchReport) + 2);
+    memcpy(&report[2], (uint8_t *)bluetooth_report, sizeof(BluetoothReport));
+    hid_device_send_interrupt_message(hid_cid, report, sizeof(BluetoothReport) + 2);
     hid_device_request_can_send_now_event(hid_cid);
-}
-
-void new_data(void *switch_report){
-
-    memcpy(&report[2], (uint8_t *)switch_report, sizeof(SwitchReport));
 }
 
 static void hid_embedded_start_gamepad(void){
     printf("Start gamepad..\n");
     report[0] = 0xA1;
-    report[1] = 0x3F;
+    report[1] = 0x03;
 
     hid_device_request_can_send_now_event(hid_cid);
 }
@@ -73,9 +67,8 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * pack
                             }
                             connected = true;
                             hid_cid = hid_subevent_connection_opened_get_hid_cid(packet);
-                            //TESTING
+                            //START
                             hid_embedded_start_gamepad();
-                            //TESTING
                             break;
                         case HID_SUBEVENT_CONNECTION_CLOSED:
                             printf("HID Disconnected\n");
@@ -98,9 +91,9 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * pack
     }
 }
 
-int btstack_hid(void *switch_data){
+int btstack_hid(void *bluetooth_data){
 
-    bluetooth_switch_report = switch_data;
+    bluetooth_report = bluetooth_data;
 
     //init_led function already init the wifi
     /*if (cyw43_arch_init()) {
@@ -113,7 +106,7 @@ int btstack_hid(void *switch_data){
     // use Limited Discoverable Mode; Peripheral;
     gap_set_class_of_device(0x2508);
     // set local name to be identified - zeroes will be replaced by actual BD ADDR
-    gap_set_local_name("Pro Controller");
+    gap_set_local_name("PicoGamepad");
     // allow for role switch in general and sniff mode
     gap_set_default_link_policy_settings( LM_LINK_POLICY_ENABLE_ROLE_SWITCH | LM_LINK_POLICY_ENABLE_SNIFF_MODE );
     // allow for role switch on outgoing connections - this allow HID Host to become master when we re-connect to it
@@ -143,23 +136,20 @@ int btstack_hid(void *switch_data){
         0xFFFF,
         0xFFFF,
         3200,
-        switch_bt_report_descriptor,
-        sizeof(switch_bt_report_descriptor),
+        bluetooth_report_descriptor,
+        sizeof(bluetooth_report_descriptor),
         hid_device_name
     };
 
-
-    create_sdp_hid_record(hid_service_buffer, &hid_sdp_record);
+    hid_create_sdp_record(hid_service_buffer, sdp_create_service_record_handle(), &hid_sdp_record);
+    btstack_assert(de_get_len( hid_service_buffer) <= sizeof(hid_service_buffer));
     sdp_register_service(hid_service_buffer);
 
 	memset(pnp_service_buffer, 0, sizeof(pnp_service_buffer));
-  	create_sdp_pnp_record(pnp_service_buffer, DEVICE_ID_VENDOR_ID_SOURCE_USB,
-                        0x057E, 0x2009, 0x0001);
-  	sdp_register_service(pnp_service_buffer);
+  	sdp_register_service(pnp_service_data);
 
   	// HID Device
-  	hid_device_init(1, sizeof(switch_bt_report_descriptor),switch_bt_report_descriptor);
-
+  	hid_device_init(0, sizeof(bluetooth_report_descriptor),bluetooth_report_descriptor);
        
     // register for HCI events
     hci_event_callback_registration.callback = &packet_handler;

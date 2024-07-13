@@ -16,6 +16,7 @@
 #if PICO_W
 
 #include "blue_hid.h"
+#include "bluetooth_descriptors.h"
 #include "wiimote.h"
 #include "wiimote_btstack.h"
 
@@ -126,6 +127,19 @@ static WiimoteReport wiimote_report = {
         .fake_motion = 0,
         .center_accel = 0
 };
+
+static BluetoothReport bluetooth_report = {
+        .dpad = 0xF,
+        .lx = 0x7F,
+        .ly = 0x7F,
+        .rx = 0x7F,
+        .ry = 0x7F,
+        .rt = 0x00,
+        .lt = 0x00,
+        .buttons1 = 0x00,
+        .buttons2 = 0x00,
+        .battery = 0x26
+};
 #endif
 
 /*------------- MAIN -------------*/
@@ -235,7 +249,7 @@ int main(void) {
     switch (DEVICE) {
         case BLUETOOTH:
 #if PICO_W
-            btstack_hid(&switchReport);
+            btstack_hid(&bluetooth_report);
 #endif
             break;
         case WII:
@@ -361,6 +375,10 @@ static void sendReportData(void *original_data) {
             new_report_fun(original_data, HOST, &xinputReport, XINPUT);
             break;
         case BLUETOOTH:
+#if PICO_W
+            new_report_fun(original_data, HOST, &bluetooth_report, BLUETOOTH);
+#endif
+            break;
         case SWITCH:
             new_report_fun(original_data, HOST, &switchReport, SWITCH);
             break;

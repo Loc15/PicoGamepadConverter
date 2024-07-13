@@ -1,1 +1,1 @@
-int btstack_hid(void *switch_data);
+int btstack_hid(void *bluetooth_data);

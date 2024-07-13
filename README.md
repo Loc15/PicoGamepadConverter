@@ -178,6 +178,7 @@ Controllers that was tested on different host modes.
 ```
 git clone https://github.com/Loc15/PicoGamepadConverter
 cd PicoGamepadConverter/
+git submodule update --init
 cd src/
 mkdir build
 cd build
