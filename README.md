@@ -68,9 +68,13 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 - Bluetooth modes only works on Pico W.
 
-- On Bluetooth device mode, the host connection is on **native usb female connector on the microcontroller**.
+- On **Bluetooth device mode**, the host connection is on **native usb female connector on the microcontroller**.
 
-- On Bluetooth host mode you must put the mac address of your gamepad. You can get this address connecting you gamepad to a PC or a mobile phone. This address _should_ be put just once time, next time you just need choose the mode.
+- On **Bluetooth device mode** if the LED blinks means that microcontroller not is connected still. The LED bliks faster than on WEB mode.
+
+- On **Bluetooth device mode** if the LED is solid on means that it is connected.
+
+- On **Bluetooth host mode** you must put the mac address of your gamepad. You can get this address connecting you gamepad to a PC or a mobile phone. This address _should_ be put just once time, next time you just need choose the mode.
 
 ---
 
