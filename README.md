@@ -191,16 +191,16 @@ Controllers that was tested on different host modes.
 
 ### Building
 
-#### If you have set PICO SDK already
-
 ```
 git clone https://github.com/Loc15/PicoGamepadConverter
 cd PicoGamepadConverter/
 git submodule update --init
-cd src/
+cd pico-sdk/
+git submodule update --init
+cd ..
 mkdir build
 cd build
-cmake ..
+cmake ../src
 make
 ```
 
@@ -217,12 +217,16 @@ _The instructions below have been successful on Windows (11) but should mostly a
 cd /home/dev
 mkdir pico
 cd pico
-git clone --recursive https://github.com/Loc15/PicoGamepadConverter.git
+git clone https://github.com/Loc15/PicoGamepadConverter
+cd PicoGamepadConverter/
+git submodule update --init
+cd pico-sdk/
+git submodule update --init
 ```
 5. Wait a bit then:
 
 ```
-cd PicoGamepadConverter
+cd ..
 mkdir build
 cd build
 cmake ../src
