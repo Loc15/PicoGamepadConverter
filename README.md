@@ -117,6 +117,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 - On PS1/PS2 device mode, the alternative connection for PS1/PS2 controllers are on **5 GPIO** for **COMMAND PIN**, **6 GPIO** for **CLOCK PIN**, **7 GPIO** for **ATTENTION PIN** and **8 GPIO** for **DATA PIN**.
 
+---
 ### Gamecube
 
 - The connection for Gamecube device mode is **19 GPIO** for **DATA PIN**.
