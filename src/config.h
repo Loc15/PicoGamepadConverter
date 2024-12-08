@@ -28,3 +28,6 @@
 #define ALT_CLK ALT_CMD + 1     // PSX CLK
 #define ALT_ATT ALT_CMD + 2     // PSX ATT
 #define ALT_DAT 8    		    // PSX DAT
+
+// Gamecube config
+#define GC_DAT_GPIO 19			// GC DATA

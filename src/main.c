@@ -12,6 +12,8 @@
 //Device
 #include "xinput_driver.h"
 #include "hid_driver.h"
+#include "controller_simulator.h"
+#include "gamecube_device.h"
 
 #if PICO_W
 
@@ -22,7 +24,6 @@
 
 #endif
 
-#include "controller_simulator.h"
 
 //Host
 #include "xinput_host.h"
@@ -117,6 +118,17 @@ static PSXInputState psxReport = {
         .r2 = 0x00
 };
 
+static GCReport gcReport = {
+        .buttons1 = 0xff,
+        .buttons2 = 0xff,
+        .lx = 0x80,
+        .ly = 0x80,
+        .rx = 0x80,
+        .ry = 0x80,
+        .l = 0x00,
+        .r = 0x00
+};
+
 #if PICO_W
 static WiimoteReport wiimote_report = {
         .wiimote = {0},
@@ -170,6 +182,7 @@ void core1_main() {
         default:
             switch (DEVICE) {
                 case WII:
+                case GC:
                 case BLUETOOTH:
                     //Wifi chip use pio, that cause problems
                     //init host stack for native usb (roothub port0)
@@ -213,7 +226,7 @@ int main(void) {
     uint8_t read_value = read_flash(0);
     HOST = read_value > 6 ? 0 : read_value;
     read_value = read_flash(1);
-    DEVICE = read_value > 6 ? 0 : read_value;
+    DEVICE = read_value > 7 ? 0 : read_value;
 
     printf("MODE HOST -> %d | MODE DEVICE -> %d\n", HOST, DEVICE);
 
@@ -262,6 +275,10 @@ int main(void) {
             // Wiimote emulator
             wiimote_emulator(&wiimote_report);
 #endif
+            break;
+        case GC:
+            // Gamecube device
+            gc_device_main(1, &gcReport, GC_DAT_GPIO);
             break;
         case PSX:
             //This core is for device modes but PS1/PS2 MODE need reboot the core1
@@ -390,6 +407,9 @@ static void sendReportData(void *original_data) {
             break;
         case PSX:
             new_report_fun(original_data, HOST, &psxReport, PSX);
+            break;
+        case GC:
+            new_report_fun(original_data, HOST, &gcReport, GC);
             break;
         case WII:
 #if PICO_W

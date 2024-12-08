@@ -5,6 +5,7 @@
 #include "SwitchDescriptors.h"
 #include "PS3_Descriptors.h"
 #include "controller_simulator.h"
+#include "gamecube_device.h"
 #if PICO_W
     #include "bluetooth_descriptors.h"
     #include "wiimote.h"
@@ -20,6 +21,7 @@
 #define XINPUT_TO_HID_X(a) ((a >> 8) - 0x80)
 #define XINPUT_TO_HID_Y(a) -((a >> 8) - 0x7F)
 //#define XINPUT_TO_HID_Y(a) -((a >> 8) - 0x80)
+#define XINPUT_TO_GC_Y(a) XINPUT_TO_HID_X(a)
 
 #define HID_TO_XINPUT_X(a) ((a - 0x80) << 8)
 #define HID_TO_XINPUT_Y(a) -((a - 0x7F) << 8)
@@ -302,6 +304,26 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
 
             device_report->l2 = host_report.bLeftTrigger;
             device_report->r2 = host_report.bRightTrigger;
+        }
+            break;
+        case GC:{
+            GCReport *device_report = new_report;
+
+            device_report->buttons1 = (host_report.wButtons & XINPUT_GAMEPAD_A ? GC_GAMEPAD_A : 0) | (host_report.wButtons & XINPUT_GAMEPAD_B ? GC_GAMEPAD_B : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_X ? GC_GAMEPAD_X : 0) | (host_report.wButtons & XINPUT_GAMEPAD_Y ? GC_GAMEPAD_Y : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_START ? GC_GAMEPAD_START : 0);
+
+            device_report->buttons2 = (host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ? GC_GAMEPAD_DPAD_LEFT : 0) | (host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ? GC_GAMEPAD_DPAD_RIGHT : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ? GC_GAMEPAD_DPAD_DOWN : 0) | (host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP ? GC_GAMEPAD_DPAD_UP : 0) |
+                                      (host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ? GC_GAMEPAD_Z : 0) | (host_report.bRightTrigger > 127 ? GC_GAMEPAD_R : 0) | (host_report.bLeftTrigger > 127 ? GC_GAMEPAD_L : 0) |
+                                      GC_BYTE_2_1;
+
+            device_report->lx = XINPUT_TO_HID_X(host_report.sThumbLX);
+            device_report->ly = XINPUT_TO_GC_Y(host_report.sThumbLY);
+            device_report->rx = XINPUT_TO_HID_X(host_report.sThumbRX);
+            device_report->ry = XINPUT_TO_GC_Y(host_report.sThumbRY);
+            device_report->l = host_report.bLeftTrigger;
+            device_report->r = host_report.bRightTrigger;
         }
             break;
         case WII: {
