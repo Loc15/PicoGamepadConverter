@@ -162,6 +162,10 @@ void core1_main() {
     if(DEVICE == PSX){
         psx_device_main();
     }
+    else if(DEVICE == GC){
+        // Gamecube device
+        gc_device_main(1, &gcReport, GC_DAT_GPIO);
+    }
 
     switch (HOST) {
         case KBD_PS2:
@@ -182,7 +186,6 @@ void core1_main() {
         default:
             switch (DEVICE) {
                 case WII:
-                case GC:
                 case BLUETOOTH:
                     //Wifi chip use pio, that cause problems
                     //init host stack for native usb (roothub port0)
@@ -277,9 +280,8 @@ int main(void) {
 #endif
             break;
         case GC:
-            // Gamecube device
-            gc_device_main(1, &gcReport, GC_DAT_GPIO);
-            break;
+            //This core is for device modes, but I need gc can use keyboard_ps2 and psx controller on host
+            // as psx device mode do it
         case PSX:
             //This core is for device modes but PS1/PS2 MODE need reboot the core1
             switch(HOST){

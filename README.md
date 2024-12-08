@@ -10,7 +10,7 @@ PicoGamepadCoverter is a project designed for RP2040 or Raspberry Pi Pico and va
 - Read input from USB and Bluetooth controllers.
 - Read inputs from no USB peripherals.
 - Web interface to choose between modes.
-- Different out modes (Dinput, Xinput, Switch, Bluetooth, PS1/PS2, WII)
+- Different out modes (Dinput, Xinput, Switch, Bluetooth, PS1/PS2, Gamecube, WII)
 - Easy to use, no overcomplicated options.
 
 ---
@@ -117,6 +117,18 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 - On PS1/PS2 device mode, the alternative connection for PS1/PS2 controllers are on **5 GPIO** for **COMMAND PIN**, **6 GPIO** for **CLOCK PIN**, **7 GPIO** for **ATTENTION PIN** and **8 GPIO** for **DATA PIN**.
 
+### Gamecube
+
+- The connection for Gamecube device mode is **19 GPIO** for **DATA PIN**.
+
+![gamecube_device_connection](./docs/Gamecube_pinout.png)
+
+- On Gamecube device mode, the host connection is on **native usb female connector on the microcontroller**.
+
+- On Gamecube device mode, the alternative connection for Keyboard PS/2 are on **5 GPIO** for **DATA PIN** and **6 GPIO** for **CLOCK PIN**.
+
+- On Gamecube device mode, the alternative connection for PS1/PS2 controllers are on **5 GPIO** for **COMMAND PIN**, **6 GPIO** for **CLOCK PIN**, **7 GPIO** for **ATTENTION PIN** and **8 GPIO** for **DATA PIN**.
+
 ---
 ## Modes
 Exist two parameter to choose on web interface, **host** and **device**. The first is the input and another one the output.
@@ -145,6 +157,7 @@ Exist two parameter to choose on web interface, **host** and **device**. The fir
 
 #### SPECIAL MODES
 - PS1/PS2: Emulation of a PS1 or PS2 controller.
+- Gamecube: Emulation of a Gamecube controller.
 
 ---
 ## Features
@@ -251,8 +264,9 @@ cp PicoGamepadConverter.uf2 d:
 - [dotcypress](https://github.com/dotcypress/ula) for the Logic Analyzer compatible with PulseView. Was very useful for PS1 controller part.
 - [usedbytes](https://github.com/usedbytes/picow_ds4) for ps4 bluetooth example.
 - [dangiu](https://github.com/dangiu/PicoMemcard) for `psxSPI.pio` program from PicoMemcard project.
-- [TonyMacDonald1995](https://github.com/TonyMacDonald1995/DS4toPS2) for PS2 controller simulation example.
+- [TonyMacDonald1995](https://github.com/TonyMacDonald1995/DS4toPS2) for PS2 controller emulation example.
 - [rnconrad](https://github.com/rnconrad/WiimoteEmulator) for the wiimote emulator project.
+- [PhobGCC](https://github.com/PhobGCC/PhobGCC-SW) for the joybus pio program (original from [JulienBernard3383279](https://github.com/JulienBernard3383279/pico-rectangle)).
 
 
 ## License
