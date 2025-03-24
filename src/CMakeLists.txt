@@ -4,6 +4,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 set(PICO_SDK_PATH ${CMAKE_CURRENT_LIST_DIR}/../pico-sdk)
+set(PICOTOOL_FETCH_FROM_GIT_PATH ${CMAKE_CURRENT_LIST_DIR}/../picotool)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
 set(PICO_BOARD pico_w)
@@ -11,7 +12,6 @@ set(PICO_BOARD pico_w)
 set(target_name PicoGamepadConverter)
 
 set(PICO_PIO_USB_DIR "${CMAKE_CURRENT_LIST_DIR}/../Pico-PIO-USB/")
-set(PICO_BTSTACK_PATH "${CMAKE_CURRENT_LIST_DIR}/btstack")
 
 #Until pico-sdk is updated
 set(PICO_TINYUSB_PATH "${CMAKE_CURRENT_LIST_DIR}/../tinyusb")
