@@ -377,7 +377,7 @@ void __time_critical_func(sel_isr_callback()) {
     // TODO refractor comment, also is __time_critical_func needed for speed? we should test if everything works without it!
     /* begin inlined call of:  gpio_acknowledge_irq(PIN_SEL, GPIO_IRQ_EDGE_RISE); kept in RAM for performance reasons */
     check_gpio_param(PIN_SEL);
-    iobank0_hw->intr[PIN_SEL / 8] = GPIO_IRQ_EDGE_RISE << (4 * (PIN_SEL % 8));
+    io_bank0_hw->intr[PIN_SEL / 8] = GPIO_IRQ_EDGE_RISE << (4 * (PIN_SEL % 8));
     /* end of inlined call */
     restart_pio_sm();
 }
