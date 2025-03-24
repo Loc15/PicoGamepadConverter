@@ -3,12 +3,11 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+set(PICO_BOARD pico_w)
+
 set(PICO_SDK_PATH ${CMAKE_CURRENT_LIST_DIR}/../pico-sdk)
 set(PICOTOOL_FETCH_FROM_GIT_PATH ${CMAKE_CURRENT_LIST_DIR}/../picotool)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
-
-set(PICO_BOARD pico_w)
-set(PICO_W FALSE)
 
 set(target_name PicoGamepadConverter)
 
@@ -69,7 +68,7 @@ target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR} devi
 target_link_libraries(${target_name} PRIVATE pico_stdlib pico_pio_usb tinyusb_device tinyusb_host ps2kbd-lib psx-lib rndis-lib parser-lib
         flash-lib psx-device gc-device)
 
-IF(PICO_W)
+IF(${PICO_BOARD} STREQUAL "pico_w" OR ${PICO_BOARD} STREQUAL "pico2_w")
     target_link_libraries(${target_name} PRIVATE pico_cyw43_arch_none bluehost-lib bluehid-lib wiimote-lib)
     add_compile_definitions(PICO_W=1)
 endif()
