@@ -163,7 +163,7 @@ Exist two parameter to choose on web interface, **host** and **device**. The fir
 ---
 ## Features
 
-You can to set some additional configuration if you required:
+You can set some additional configuration if you required:
 
 ![features](./docs/features.png)
 
@@ -200,7 +200,7 @@ git submodule update --init
 cd ..
 mkdir build
 cd build
-cmake ../src
+cmake ../src -DPICO_BOARD=your_pico
 make
 ```
 
@@ -229,7 +229,7 @@ git submodule update --init
 cd ..
 mkdir build
 cd build
-cmake ../src
+cmake ../src -DPICO_BOARD=your_pico
 ```
 
 6. Wait a bit more then:
