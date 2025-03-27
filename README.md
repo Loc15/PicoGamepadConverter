@@ -2,7 +2,7 @@
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O4O8TQSC8)
 
-PicoGamepadCoverter is a project designed for RP2040 or Raspberry Pi Pico and variants, that enabling switch to different gamepad modes using a gamepad as input. Re-use old gamepads that don't support USB connections or make compatibles with certain platform.
+PicoGamepadCoverter is a project designed for RP2040, RP2350 or Raspberry Pi Pico and variants, that enabling switch to different gamepad modes using a gamepad as input. Re-use old gamepads that don't support USB connections or make compatibles with certain platform.
 
 ---
 ## Features
@@ -20,7 +20,7 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 ### Prerequisites
 
-- Raspberry Pi Pico microcontroller or another RP2040 boards.
+- Raspberry Pi Pico microcontroller or another RP2040 or RP2350 boards.
 - OTG cable (micro-USB or USB-C it depends on your board)
 - USB female connector (Recommended be the same type of OTG cable)
 - USB cable (micro-USB or USB-C it depends on your board)
