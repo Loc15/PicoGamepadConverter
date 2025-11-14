@@ -11,6 +11,12 @@ void init_led();
 void led_on();
 //Turn off the led
 void led_off();
+//Set color from mode
+void set_color_led(uint8_t device);
+//Disable control over color led and deletes pio occupation
+void disable_led_color_control();
+//Boostel button
+bool get_bootsel_button();
 
 
 #endif //PROTOTYPE_UTILS_H

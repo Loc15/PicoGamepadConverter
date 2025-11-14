@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 #set(PICO_BOARD pico_w)
 
-set(PICO_SDK_PATH ${CMAKE_CURRENT_LIST_DIR}/../pico-sdk)
+set(ENV{PICO_SDK_PATH} ${CMAKE_CURRENT_LIST_DIR}/../pico-sdk)
 set(PICOTOOL_FETCH_FROM_GIT_PATH ${CMAKE_CURRENT_LIST_DIR}/../picotool)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 
@@ -65,7 +65,7 @@ target_compile_definitions(${target_name} PRIVATE PIO_USB_USE_TINYUSB)
 # needed so tinyusb can find tusb_config.h
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR} device_files/switch device_files/xinput host_files)
 
-target_link_libraries(${target_name} PRIVATE pico_stdlib pico_pio_usb tinyusb_device tinyusb_host ps2kbd-lib psx-lib rndis-lib parser-lib
+target_link_libraries(${target_name} PRIVATE pico_stdlib pico_pio_usb pico_status_led tinyusb_device tinyusb_host ps2kbd-lib psx-lib rndis-lib parser-lib
         flash-lib psx-device gc-device)
 
 IF(${PICO_BOARD} STREQUAL "pico_w" OR ${PICO_BOARD} STREQUAL "pico2_w")

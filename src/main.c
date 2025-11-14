@@ -223,6 +223,12 @@ int main(void) {
 
     stdio_init_all();
 
+#ifndef NDEBUG
+    //Bug on debug
+    //https://forums.raspberrypi.com/viewtopic.php?t=363914
+    timer_hw->dbgpause = 0;
+#endif
+
     /*LED*/
     init_led();
 
@@ -247,10 +253,18 @@ int main(void) {
     sleep_ms(3000);
 
     /*WEB INTERFACE*/
-    if (gpio_get(WEB_PIN)) {
+    if (get_bootsel_button()) {
         DEVICE = WEB;
+#ifdef USE_WS2812_LED
+        set_color_led(DEVICE);
+#endif
         rndis();
     }
+
+#ifdef USE_WS2812_LED
+    set_color_led(DEVICE);
+    //disable_led_color_control();
+#endif
 
     sleep_ms(10);
 
@@ -299,6 +313,7 @@ int main(void) {
                     btstack_host(sendReportData);
 #endif
                     break;
+#ifndef USB_A_HOST
                 default:
                     //init host stack for native usb (roothub port0)
                     tuh_init(0);
@@ -306,6 +321,24 @@ int main(void) {
                         tuh_task();
                     }
                     break;
+#else
+                default: {
+                    // Use tuh_configure() to pass pio configuration to the host stack
+                    // Note: tuh_configure() must be called before
+                    pio_usb_configuration_t pio_cfg = PIO_USB_DEFAULT_CONFIG;
+                    pio_cfg.pin_dp = PIO_USB_PIN;
+                    tuh_configure(1, TUH_CFGID_RPI_PIO_USB_CONFIGURATION, &pio_cfg);
+
+                    // To run USB SOF interrupt in core1, init host stack for pio_usb (roothub
+                    // port1) on core1
+                    tuh_init(1);
+
+                    while (true) {
+                        tuh_task(); // tinyusb host task
+                    }
+                }
+                    break;
+#endif
             }
             break;
         default:
