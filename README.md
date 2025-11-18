@@ -131,6 +131,16 @@ To get started with PicoGamepadConverter, follow the steps below:
 - On Gamecube device mode, the alternative connection for PS1/PS2 controllers are on **5 GPIO** for **COMMAND PIN**, **6 GPIO** for **CLOCK PIN**, **7 GPIO** for **ATTENTION PIN** and **8 GPIO** for **DATA PIN**.
 
 ---
+
+---
+### Nintendo 64
+
+- The connection for Nintendo 64 controller host mode is **19 GPIO** for **DATA PIN**.
+
+![gamecube_device_connection](./docs/Gamecube_pinout.png)
+![n64_showcase](./docs/n64_host_mode.gif)
+
+---
 ## Modes
 Exist two parameter to choose on web interface, **host** and **device**. The first is the input and another one the output.
 
@@ -145,6 +155,7 @@ Exist two parameter to choose on web interface, **host** and **device**. The fir
 #### SPECIAL MODES
 - Keyboard/PS2: Support keyboards with PS/2 connector.
 - PS1/PS2: Support PS1 and PS2 controllers. (_Put a pull-up resistor on data pin_)
+- N64: Support N64 controllers.
 
  ### DEVICE
  #### USB MODES
@@ -176,7 +187,7 @@ You can set some additional configuration if you required:
 ## Testing
 Controllers that was tested on different host modes.
  
-| Tested Controllers     | 	Modes (Host)             |
+| Tested Controllers     | 	Modes (Host)            | 
 |------------------------|---------------------------|
 | Logitech F710          | Xinput, Dinput            |
 | 8BitDo Ultimate 2.4G   | Xinput, Dinput, Bluetooth |
@@ -186,6 +197,7 @@ Controllers that was tested on different host modes.
 | DualShock 3 (PS3)      | Dinput                    |
 | DualShock 4 (PS4)      | Dinput, Bluetooth         |
 | Keyboard HP KB-0316    | Keyboard PS/2             |
+| Nintendo 64 Controller | Nintendo 64               |
 
 ---
 
@@ -272,6 +284,7 @@ cp PicoGamepadConverter.uf2 d:
 - [TonyMacDonald1995](https://github.com/TonyMacDonald1995/DS4toPS2) for PS2 controller emulation example.
 - [rnconrad](https://github.com/rnconrad/WiimoteEmulator) for the wiimote emulator project.
 - [PhobGCC](https://github.com/PhobGCC/PhobGCC-SW) for the joybus pio program (original from [JulienBernard3383279](https://github.com/JulienBernard3383279/pico-rectangle)).
+- [DavidPagels](https://github.com/DavidPagels/retro-pico-switch) for the N64 controller read example.
 
 
 ## License

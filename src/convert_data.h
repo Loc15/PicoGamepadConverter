@@ -7,6 +7,7 @@ typedef enum {
     BLUETOOTH,
     WII,
     GC,
+    N64,
     WEB
 } MODE;
 

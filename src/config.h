@@ -48,6 +48,11 @@
 
     // Gamecube config
     #define GC_DAT_GPIO 29			// GC DATA
+
+    // Nintendo 64 config
+    #define N64_DAT_GPIO 29			// N64 DATA
+    // Alternative for N64 host mode
+    #define ALT_N64_DAT_GPIO 2		// N64 DATA
 #else
     // KBD data and clock inputs must be consecutive with
     // data in the lower position.
@@ -63,7 +68,7 @@
     #define CLK CMD + 1     // PSX CLK
     #define ATT CMD + 2     // PSX ATT
     #define DAT 22    		// PSX DAT
-    // Alternative for PS1/PS2 device mode
+    // Alternative for PS1/PS2 host mode
     #define ALT_CMD 5    		    // PSX CMD
     #define ALT_CLK ALT_CMD + 1     // PSX CLK
     #define ALT_ATT ALT_CMD + 2     // PSX ATT
@@ -71,4 +76,9 @@
 
     // Gamecube config
     #define GC_DAT_GPIO 19			// GC DATA
+
+    // Nintendo 64 config
+    #define N64_DAT_GPIO 19			// N64 DATA
+    // Alternative for N64 host mode
+    #define ALT_N64_DAT_GPIO 5		// N64 DATA
 #endif

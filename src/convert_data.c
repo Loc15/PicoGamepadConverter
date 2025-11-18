@@ -14,6 +14,7 @@
 #include "xinput_definitions.h"
 #include "hid_definitions.h"
 #include "psx_definitions.h"
+#include "n64_controller.h"
 //itself
 #include "convert_data.h"
 
@@ -27,6 +28,8 @@
 #define HID_TO_XINPUT_Y(a) -((a - 0x7F) << 8)
 
 #define KEYBOARD_MASK_REVERSE(a,b)    ((a >> b)&1)
+
+#define XINPUT_JOYSTICK_MID_UINT16 0x7FFF
 
 #if PICO_W
     #define XINPUT_TO_WIIMOTE(a) ((a>>8))
@@ -222,6 +225,25 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                 host_report.bLeftTrigger = (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_L2 ? 0 : 0xFF);
                 host_report.bRightTrigger = (DATA_SHIFT(psx_data[4]) & PSX_GAMEPAD_R2 ? 0 : 0xFF);
             }
+            break;
+        case N64:{
+                uint8_t *joybus_response = report;
+                host_report.wButtons = (N64_MASK_DPAD_UP & joybus_response[0] ? XINPUT_GAMEPAD_DPAD_UP : 0) | (N64_MASK_DPAD_DOWN & joybus_response[0] ? XINPUT_GAMEPAD_DPAD_DOWN : 0) |
+                                        (N64_MASK_DPAD_LEFT & joybus_response[0] ? XINPUT_GAMEPAD_DPAD_LEFT : 0) | (N64_MASK_DPAD_RIGHT & joybus_response[0] ? XINPUT_GAMEPAD_DPAD_RIGHT : 0) |
+                                        (N64_MASK_START & joybus_response[0] ? XINPUT_GAMEPAD_START : 0) | (N64_MASK_A & joybus_response[0] ? XINPUT_GAMEPAD_A : 0) |
+                                        (N64_MASK_B & joybus_response[0] ? XINPUT_GAMEPAD_B : 0) | (N64_MASK_C_DOWN & joybus_response[1] ? XINPUT_GAMEPAD_X : 0) |
+                                        (N64_MASK_C_LEFT & joybus_response[1] ? XINPUT_GAMEPAD_Y : 0) | (N64_MASK_L & joybus_response[1] ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
+                                        (N64_MASK_R & joybus_response[1] ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) | (N64_MASK_RESET & joybus_response[1] ? XINPUT_GAMEPAD_GUIDE : 0) |
+                                        (N64_MASK_C_UP & joybus_response[1] ? XINPUT_GAMEPAD_BACK : 0);
+
+                host_report.bRightTrigger = (N64_MASK_Z & joybus_response[0] ? 0xFF : 0);
+                host_report.bLeftTrigger = (N64_MASK_C_RIGHT & joybus_response[1] ? 0xFF : 0);
+
+                host_report.sThumbLX = (int16_t)(n64_convert_axis(joybus_response[2], XINPUT_JOYSTICK_MID_UINT16, 0) - XINPUT_JOYSTICK_MID_UINT16);
+                host_report.sThumbLY = (int16_t)(n64_convert_axis(joybus_response[3], XINPUT_JOYSTICK_MID_UINT16, 1) - XINPUT_JOYSTICK_MID_UINT16);
+                host_report.sThumbRX = 0;
+                host_report.sThumbRY = 0;
+                }
             break;
         default:
             /*XINPUT*/

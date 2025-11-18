@@ -30,6 +30,7 @@
 #include "xinput_host.h"
 #include "ps2kbd.h"
 #include "psx.h"
+#include "n64_controller.h"
 
 #if PICO_W
 
@@ -130,6 +131,8 @@ static GCReport gcReport = {
         .r = 0x00
 };
 
+static uint8_t joybus_response[4];
+
 #if PICO_W
 static WiimoteReport wiimote_report = {
         .wiimote = {0},
@@ -174,6 +177,13 @@ void core1_main() {
             break;
         case PSX:
             psx_init(1, CMD, DAT, read_psx_controller);
+            break;
+        case N64:
+            n64_controller_init(1, N64_DAT_GPIO, joybus_response);
+            while(1){
+                n64_controller_update_state();
+                sendReportData(joybus_response);
+            }
             break;
         case BLUETOOTH:
             //It can't have input and output bluetooth simultaneously
@@ -234,7 +244,7 @@ int main(void) {
 
     /*READ MODES FROM FLASH*/
     uint8_t read_value = read_flash(0);
-    HOST = read_value > 6 ? 0 : read_value;
+    HOST = read_value > 8 ? 0 : read_value;
     read_value = read_flash(1);
     DEVICE = read_value > 7 ? 0 : read_value;
 
@@ -307,6 +317,13 @@ int main(void) {
                 case PSX:
                     psx_init(1, ALT_CMD, ALT_DAT, read_psx_controller);
                     while(1){};
+                    break;
+                case N64:
+                    n64_controller_init(1, ALT_N64_DAT_GPIO, joybus_response);
+                    while(1){
+                        n64_controller_update_state();
+                        sendReportData(joybus_response);
+                    }
                     break;
                 case BLUETOOTH:
 #if PICO_W

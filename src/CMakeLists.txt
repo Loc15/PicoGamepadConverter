@@ -44,6 +44,7 @@ add_subdirectory(${PICO_PIO_USB_DIR} pico_pio_usb)
 
 add_subdirectory(host_files/ps2kbd-lib)
 add_subdirectory(host_files/psx-lib)
+add_subdirectory(host_files/joybus_host)
 add_subdirectory(host_files/parser-lib)
 add_subdirectory(host_files/bluehost-lib)
 add_subdirectory(device_files/rndis-lib)
@@ -66,7 +67,7 @@ target_compile_definitions(${target_name} PRIVATE PIO_USB_USE_TINYUSB)
 target_include_directories(${target_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR} device_files/switch device_files/xinput host_files)
 
 target_link_libraries(${target_name} PRIVATE pico_stdlib pico_pio_usb pico_status_led tinyusb_device tinyusb_host ps2kbd-lib psx-lib rndis-lib parser-lib
-        flash-lib psx-device gc-device)
+        flash-lib psx-device gc-device joybus_host)
 
 IF(${PICO_BOARD} STREQUAL "pico_w" OR ${PICO_BOARD} STREQUAL "pico2_w")
     target_link_libraries(${target_name} PRIVATE pico_cyw43_arch_none bluehost-lib bluehid-lib wiimote-lib)
