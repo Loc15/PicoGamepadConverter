@@ -98,6 +98,8 @@ To get started with PicoGamepadConverter, follow the steps below:
 
 - You can simulate movement for games that require it pressing the **LB** (Xbox layout) / the left shoulder button.
 
+![wii_showcase](./docs/wii_device_mode.gif)
+
 ---
 #### PS1/PS2
 
