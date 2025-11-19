@@ -17,6 +17,7 @@ void set_color_led(uint8_t device);
 void disable_led_color_control();
 //Boostel button
 bool get_bootsel_button();
-
+//Pio to use
+uint8_t what_pio_use(uint8_t host);
 
 #endif //PROTOTYPE_UTILS_H

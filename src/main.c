@@ -168,7 +168,7 @@ void core1_main() {
     }
     else if(DEVICE == GC){
         // Gamecube device
-        gc_device_main(1, &gcReport, GC_DAT_GPIO);
+        gc_device_main(what_pio_use(HOST), &gcReport, GC_DAT_GPIO);
     }
 
     switch (HOST) {
@@ -280,7 +280,7 @@ int main(void) {
 
     /*Check if PS1/PS2 DEVICE MODE is enabled*/
     if(DEVICE == PSX){
-        psx_device_init(0, &psxReport, core1_main);
+        psx_device_init(what_pio_use(HOST), &psxReport, core1_main);
     }
 
     multicore_reset_core1();

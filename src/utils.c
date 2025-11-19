@@ -140,3 +140,16 @@ bool __no_inline_not_in_flash_func(get_bootsel_button)() {
 
     return button_state;
 }
+
+uint8_t what_pio_use(uint8_t host){
+    switch ((MODE)host) {
+        case KBD_PS2:
+        case PSX:
+        case N64:
+        case BLUETOOTH:
+        case WII:
+            return 0;
+        default:
+            return 1;
+    }
+}
