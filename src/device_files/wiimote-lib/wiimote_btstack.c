@@ -6,9 +6,16 @@
 #include "sdp_consts.h"
 #include "wiimote.h"
 #include "motion.h"
+#include <btstack_tlv.h>
 
 #define SDP_RESPONSE_BUFFER_SIZE (HCI_ACL_PAYLOAD_SIZE-L2CAP_HEADER_SIZE)
 
+// TAG to store remote device address in TLV
+#define TLV_TAG_HIDR ((((uint32_t) 'H') << 24 ) | (((uint32_t) 'I') << 16) | (((uint32_t) 'D') << 8) | 'R')
+
+// used to store remote device in TLV
+static const btstack_tlv_t * btstack_tlv_singleton_impl;
+static void *                btstack_tlv_singleton_context;
 bd_addr_t wii_baddr;
 static uint8_t hid_service_buffer[700];
 static uint8_t pnp_service_buffer[200];
@@ -131,6 +138,7 @@ static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* p
             // Wait for the stack to enter the initializing state, before setting the IAC LAP
             if (btstack_event_state_get_state(packet) == HCI_STATE_WORKING) {
                 set_iac_lap = 1;
+                btstack_tlv_get_instance(&btstack_tlv_singleton_impl, &btstack_tlv_singleton_context);
             }
             break;
         case HCI_EVENT_COMMAND_COMPLETE:
@@ -138,6 +146,7 @@ static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* p
             if (hci_event_command_complete_get_command_opcode(packet) == hci_write_current_iac_lap_one_iac.opcode) {
                 uint8_t status = hci_event_command_complete_get_return_parameters(packet)[0];
                 printf("Set IAC LAP: %s\n", (status != ERROR_CODE_SUCCESS) ? "Failed" : "OK");
+                hid_device_connect(wii_baddr, &hid_cid);
             }
             break;
         case HCI_EVENT_PIN_CODE_REQUEST:
@@ -181,6 +190,10 @@ static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* p
                         hid_cid = hid_subevent_connection_opened_get_hid_cid(packet);
                         printf("Connected to ");
                         printf_hexdump(wii_baddr, sizeof(wii_baddr));
+                        // store device as bonded
+                        if (btstack_tlv_singleton_impl){
+                            btstack_tlv_singleton_impl->store_tag(btstack_tlv_singleton_context, TLV_TAG_HIDR, (const uint8_t *) &wii_baddr, sizeof(bd_addr_t));
+                        }
                         // Remove timer led
                         btstack_run_loop_remove_timer(&led_state);
                         // Set the led on
