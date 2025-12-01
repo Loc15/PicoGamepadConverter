@@ -141,7 +141,8 @@ static WiimoteReport wiimote_report = {
         .switch_mode = 0,
         .mode = NO_EXTENSION,
         .fake_motion = 0,
-        .center_accel = 0
+        .center_accel = 0,
+        .console_info = {0}
 };
 
 static BluetoothReport bluetooth_report = {
@@ -162,6 +163,9 @@ static BluetoothReport bluetooth_report = {
 
 // core1: handle host events
 void core1_main() {
+#if PICO_W
+    flash_safe_execute_core_init();
+#endif
     //PS1/PS2 DEVICE MODE NEED REBOOT THE CORE
     if(DEVICE == PSX){
         psx_device_main();
@@ -256,6 +260,16 @@ int main(void) {
         features_data[i] = read_flash(9 + i);
     }
     set_features_from_flash(features_data);
+
+#if PICO_W
+    /*READ WII CONSOLE ADDR*/
+    if(DEVICE == WII){
+        wiimote_report.console_info.wii_addr_saved = read_flash(27);
+        for (int i = 0; i < 6; ++i) {
+            wiimote_report.console_info.wii_addr[i] = read_flash(28 + i);
+        }
+    }
+#endif
 
     gpio_init(WEB_PIN);
     gpio_set_dir(WEB_PIN, GPIO_IN);

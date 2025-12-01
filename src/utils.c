@@ -8,6 +8,7 @@
 #include "hardware/sync.h"
 #include "hardware/structs/ioqspi.h"
 #include "hardware/structs/sio.h"
+#include "pico_flash.h"
 
 #include "utils.h"
 #include "config.h"
@@ -152,4 +153,20 @@ uint8_t what_pio_use(uint8_t host){
         default:
             return 1;
     }
+}
+
+void save_wii_addr(void *wii_addr){
+    //Copy the saved old data
+    uint8_t buffer[256];
+    for (int i = 0; i < 27; ++i){
+        buffer[i] = read_flash(i);
+    }
+    // Set saved wii_addr
+    buffer[27] = 1;
+
+    //Copy wii_addr
+    memcpy(&buffer[28], (uint8_t *)wii_addr, 6);
+
+    //Write to flash
+    write_flash(buffer, 1);
 }

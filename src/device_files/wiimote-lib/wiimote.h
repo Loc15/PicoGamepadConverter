@@ -186,17 +186,22 @@ struct wiimote_buttons{
   int8_t ir_y;
 };
 
+struct wii_console_info{
+  uint8_t wii_addr_saved;
+  uint8_t wii_addr[6];
+};
 
 //new adding -> wiimote + classic
 typedef struct{
   struct wiimote_buttons wiimote;
-    struct wiimote_nunchuk nunchuk;
+  struct wiimote_nunchuk nunchuk;
   struct wiimote_classic classic;
   uint8_t switch_mode;
   uint8_t mode;
   uint8_t reset_ir;
   uint8_t fake_motion;
   uint8_t center_accel;
+  struct wii_console_info console_info;
 }WiimoteReport;
 
 enum MODE_WIIMOTE{

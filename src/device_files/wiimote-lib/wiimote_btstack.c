@@ -7,6 +7,8 @@
 #include "wiimote.h"
 #include "motion.h"
 #include <btstack_tlv.h>
+#include "pico/flash.h"
+#include "utils.h"
 
 #define SDP_RESPONSE_BUFFER_SIZE (HCI_ACL_PAYLOAD_SIZE-L2CAP_HEADER_SIZE)
 
@@ -146,6 +148,7 @@ static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* p
             if (hci_event_command_complete_get_command_opcode(packet) == hci_write_current_iac_lap_one_iac.opcode) {
                 uint8_t status = hci_event_command_complete_get_return_parameters(packet)[0];
                 printf("Set IAC LAP: %s\n", (status != ERROR_CODE_SUCCESS) ? "Failed" : "OK");
+                memcpy(wii_baddr, (const uint8_t *)input_report->console_info.wii_addr, 6);
                 hid_device_connect(wii_baddr, &hid_cid);
             }
             break;
@@ -185,11 +188,21 @@ static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t* p
                             // outgoing connection failed
                             printf("Connection failed, status 0x%x\n", status);
                             hid_cid = 0;
+                            // Authentication Failure -> Need to Sync again with the console
+                            if(status == 0x66){
+                                input_report->console_info.wii_addr_saved = 0;
+                                printf("Fail to connect -> Need to Sync again\n");
+                            }
                             return;
                         }
                         hid_cid = hid_subevent_connection_opened_get_hid_cid(packet);
                         printf("Connected to ");
                         printf_hexdump(wii_baddr, sizeof(wii_baddr));
+                        // Only save the addr if they are different or If the authentications failed
+                        if((memcmp(wii_baddr, (const uint8_t *)input_report->console_info.wii_addr, 6) != 0) || !input_report->console_info.wii_addr_saved){
+                            flash_safe_execute(save_wii_addr, wii_baddr, 100);
+                            printf("Wii addr saved\n");
+                        }
                         // store device as bonded
                         if (btstack_tlv_singleton_impl){
                             btstack_tlv_singleton_impl->store_tag(btstack_tlv_singleton_context, TLV_TAG_HIDR, (const uint8_t *) &wii_baddr, sizeof(bd_addr_t));

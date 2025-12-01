@@ -19,5 +19,7 @@ void disable_led_color_control();
 bool get_bootsel_button();
 //Pio to use
 uint8_t what_pio_use(uint8_t host);
+//Save wii addr
+void save_wii_addr(void *wii_addr);
 
 #endif //PROTOTYPE_UTILS_H
