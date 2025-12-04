@@ -58,7 +58,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       double host, device, bhid;
       //copy the saved old data
       uint8_t buffer[256];
-      for (int i = 0; i < 27; ++i)
+      for (int i = 0; i < 34; ++i)
       {
         buffer[i] = read_flash(i);
       }
@@ -93,7 +93,7 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       double features = 0;
       //copy the saved old data
       uint8_t buffer[256];
-      for (int i = 0; i < 27; ++i)
+      for (int i = 0; i < 34; ++i)
       {
         buffer[i] = read_flash(i);
       }
