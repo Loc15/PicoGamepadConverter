@@ -426,37 +426,19 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
 
                     // Fake motion
                     if (host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) {
-
                         device_report->fake_motion = 1;
-
-                        int8_t step = 48;
-
-                        if(device_report->wiimote.accel_x > 1000 || device_report->wiimote.accel_x < 10){
-                            step = -step;
-                        }
-
-                        // Start moving all directions
-
-                        device_report->wiimote.accel_x = step + (device_report->wiimote.accel_x & 0x3FF);
-                        device_report->nunchuk.accel_x = step + (device_report->nunchuk.accel_x & 0x3FF);
-
-                        device_report->wiimote.accel_y = step + (device_report->wiimote.accel_y & 0x3FF);
-                        device_report->nunchuk.accel_y = step + (device_report->nunchuk.accel_y & 0x3FF);
-
-                        device_report->wiimote.accel_z = step + (device_report->wiimote.accel_z & 0x3FF);
-                        device_report->nunchuk.accel_z = step + (device_report->nunchuk.accel_z & 0x3FF);
                     } else {
                         if (device_report->fake_motion) {
 
                             // Set center values
-                            device_report->wiimote.accel_x += 0x82 << 2;
-                            device_report->nunchuk.accel_x += 0x82 << 2;
+                            device_report->wiimote.accel_x = 0x82 << 2;
+                            device_report->nunchuk.accel_x = 0x82 << 2;
 
-                            device_report->wiimote.accel_y += 0x82 << 2;
-                            device_report->nunchuk.accel_y += 0x82 << 2;
+                            device_report->wiimote.accel_y = 0x82 << 2;
+                            device_report->nunchuk.accel_y = 0x82 << 2;
 
-                            device_report->wiimote.accel_z += 0x9f << 2;
-                            device_report->nunchuk.accel_z += 0x9f << 2;
+                            device_report->wiimote.accel_z = 0x9f << 2;
+                            device_report->nunchuk.accel_z = 0x9f << 2;
 
                             device_report->fake_motion = 0;
                             device_report->center_accel = 1;

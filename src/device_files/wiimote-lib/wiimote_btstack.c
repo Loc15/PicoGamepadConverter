@@ -489,6 +489,28 @@ static void input_update_wiimote(){
             set_motion_state(&wiimote, pointer_x, pointer_y);
 
             if(input_report->fake_motion || input_report->center_accel){
+
+                if(input_report->fake_motion) {
+                    static int step = 48;
+
+                    if(input_report->wiimote.accel_x >= 1000 || input_report->wiimote.accel_x <= 100){
+                        step = -step;
+                    }
+
+                    // Start moving all directions
+
+                    int temp_value = step + input_report->wiimote.accel_x;
+
+                    input_report->wiimote.accel_x = (uint16_t)temp_value;
+                    input_report->nunchuk.accel_x = (uint16_t)temp_value;
+
+                    input_report->wiimote.accel_y = (uint16_t)temp_value;
+                    input_report->nunchuk.accel_y = (uint16_t)temp_value;
+
+                    input_report->wiimote.accel_z = (uint16_t)temp_value;
+                    input_report->nunchuk.accel_z = (uint16_t)temp_value;
+                }
+
                 wiimote.usr.accel_x = input_report->wiimote.accel_x;
                 wiimote.usr.accel_y = input_report->wiimote.accel_y;
                 wiimote.usr.accel_z = input_report->wiimote.accel_z;
