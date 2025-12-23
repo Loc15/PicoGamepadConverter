@@ -365,8 +365,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
             switch (device_report->mode) {
                 case NO_EXTENSION:
                     /*new data*/
-                    device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_B;
-                    device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_B;
                     device_report->wiimote.minus = host_report.wButtons & XINPUT_GAMEPAD_BACK;
                     device_report->wiimote.plus = host_report.wButtons & XINPUT_GAMEPAD_START;
                     device_report->wiimote.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
@@ -395,8 +395,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                 case WIIMOTE_AND_NUNCHUCK:
                     /*new data*/
                     /*wiimote*/
-                    device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_B;
-                    device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->wiimote.a = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->wiimote.b = host_report.wButtons & XINPUT_GAMEPAD_B;
                     device_report->wiimote.minus = host_report.wButtons & XINPUT_GAMEPAD_BACK;
                     device_report->wiimote.plus = host_report.wButtons & XINPUT_GAMEPAD_START;
                     device_report->wiimote.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
@@ -452,8 +452,8 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     break;
                 case CLASSIC_CONTROLLER:
                     /*new data*/
-                    device_report->classic.a = host_report.wButtons & XINPUT_GAMEPAD_B;
-                    device_report->classic.b = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->classic.a = host_report.wButtons & XINPUT_GAMEPAD_A;
+                    device_report->classic.b = host_report.wButtons & XINPUT_GAMEPAD_B;
                     device_report->classic.x = host_report.wButtons & XINPUT_GAMEPAD_Y;
                     device_report->classic.y = host_report.wButtons & XINPUT_GAMEPAD_X;
                     device_report->classic.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
