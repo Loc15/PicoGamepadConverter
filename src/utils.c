@@ -159,14 +159,14 @@ uint8_t what_pio_use(uint8_t host){
 void save_wii_addr(void *wii_addr){
     //Copy the saved old data
     uint8_t buffer[256];
-    for (int i = 0; i < 36; ++i){
+    for (int i = 0; i < TOTAL_SIZE_IN_FLASH; ++i){
         buffer[i] = read_flash(i);
     }
     // Set saved wii_addr
-    buffer[27] = 1;
+    buffer[WII_ADDR_SET_OFFSET] = 1;
 
     //Copy wii_addr
-    memcpy(&buffer[28], (uint8_t *)wii_addr, 6);
+    memcpy(&buffer[WII_ADDR_OFFSET], (uint8_t *)wii_addr, WII_ADDR_SIZE);
 
     //Write to flash
     write_flash(buffer, 1);
