@@ -163,9 +163,7 @@ static BluetoothReport bluetooth_report = {
 
 // core1: handle host events
 void core1_main() {
-#if PICO_W
     flash_safe_execute_core_init();
-#endif
     //PS1/PS2 DEVICE MODE NEED REBOOT THE CORE
     if(DEVICE == PSX){
         psx_device_main();
@@ -237,6 +235,8 @@ int main(void) {
 
     stdio_init_all();
 
+    flash_safe_execute_core_init();
+
 #ifndef NDEBUG
     //Bug on debug
     //https://forums.raspberrypi.com/viewtopic.php?t=363914
@@ -247,26 +247,31 @@ int main(void) {
     init_led();
 
     /*READ MODES FROM FLASH*/
-    uint8_t read_value = read_flash(0);
+    uint8_t read_value = read_flash(HOST_MODE_OFFSET);
     HOST = read_value > 8 ? 0 : read_value;
-    read_value = read_flash(1);
+    read_value = read_flash(DEVICE_MODE_OFFSET);
     DEVICE = read_value > 7 ? 0 : read_value;
 
     printf("MODE HOST -> %d | MODE DEVICE -> %d\n", HOST, DEVICE);
 
     /*READ FEATURES FROM FLASH*/
-    uint8_t features_data[18];
-    for (int i = 0; i < 18; ++i) {
-        features_data[i] = read_flash(9 + i);
+    const uint8_t total_features_data = SET_FEATURE_SIZE + SIZE_FEATURES_SIZE + FEATURES_SIZE + DATA_FEATURES_SIZE;
+    uint8_t features_data[20];
+    for (int i = 0; i < total_features_data; ++i) {
+        features_data[i] = read_flash(SET_FEATURE_OFFSET + i);
+    }
+    /*FAST SWITCH MODE HOTKEYS*/
+    for (int i = 0; i < SWITCH_MODE_BUTTONS_SIZE; ++i) {
+        features_data[total_features_data + i] = read_flash(SWITCH_MODE_BUTTONS_OFFSET + i);
     }
     set_features_from_flash(features_data);
 
 #if PICO_W
     /*READ WII CONSOLE ADDR*/
     if(DEVICE == WII){
-        wiimote_report.console_info.wii_addr_saved = read_flash(27);
-        for (int i = 0; i < 6; ++i) {
-            wiimote_report.console_info.wii_addr[i] = read_flash(28 + i);
+        wiimote_report.console_info.wii_addr_saved = read_flash(WII_ADDR_SET_OFFSET);
+        for (int i = 0; i < WII_ADDR_SIZE; ++i) {
+            wiimote_report.console_info.wii_addr[i] = read_flash(WII_ADDR_OFFSET + i);
         }
     }
 #endif

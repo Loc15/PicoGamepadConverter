@@ -21,5 +21,7 @@ bool get_bootsel_button();
 uint8_t what_pio_use(uint8_t host);
 //Save wii addr
 void save_wii_addr(void *wii_addr);
+//Swap modes in flash
+void swap_modes_in_flash(void *alternative_mode);
 
 #endif //PROTOTYPE_UTILS_H

@@ -18,6 +18,10 @@
 //itself
 #include "convert_data.h"
 
+#include <stdio.h>
+#include "utils.h"
+#include "pico/flash.h"
+
 //Definitions
 #define XINPUT_TO_HID_X(a) ((a >> 8) - 0x80)
 #define XINPUT_TO_HID_Y(a) -((a >> 8) - 0x7F)
@@ -535,6 +539,21 @@ void set_features_from_flash(unsigned char *data){
     memcpy(features.enabled_features, &data[2], 8);
     //data features
     memcpy(features.data_features, &data[10], 8);
+    //fast switch mode hotkeys
+    features.hotkey_1 = (1 << (data[18] & 0x0F)) << (8 * (data[18] >> 4));
+    features.hotkey_2 = (1 << (data[18 + 1] & 0x0F)) << (8 * (data[18 + 1] >> 4));
+}
+
+void set_fast_switch_mode(xinput_gamepad_t *host_report) {
+    static uint8_t pressed_hotkeys = 0;
+    if((host_report->wButtons & features.hotkey_1 ? 1 : 0) & (host_report->wButtons & features.hotkey_2 ? 1 : 0)) {
+        pressed_hotkeys = 1;
+    }
+    else if (pressed_hotkeys) {
+        pressed_hotkeys = 0;
+        printf("Swap modes\n");
+        flash_safe_execute(swap_modes_in_flash, &features.data_features[SWITCH_MODE], 1000);
+    }
 }
 
 void set_deadzone(xinput_gamepad_t *host_report, int select_analog, uint8_t p_dead_zone){
@@ -651,6 +670,9 @@ void set_features(xinput_gamepad_t *host_report){
             if((features.data_features[DEAD_ZONE] >> 7)){
                 set_deadzone(host_report, 2, features.data_features[DEAD_ZONE] & 0x7F);
             } 
+            break;
+        case SWITCH_MODE:
+            set_fast_switch_mode(host_report);
             break;
         default:
             break;

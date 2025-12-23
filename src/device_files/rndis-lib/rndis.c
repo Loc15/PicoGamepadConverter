@@ -6,6 +6,7 @@
 
 #include "utils.h"
 #include "pico_flash.h"
+#include "convert_data.h"
 
 static struct mg_tcpip_if *s_ifp;
 
@@ -58,27 +59,27 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       double host, device, bhid;
       //copy the saved old data
       uint8_t buffer[256];
-      for (int i = 0; i < 34; ++i)
+      for (int i = 0; i < TOTAL_SIZE_IN_FLASH; ++i)
       {
         buffer[i] = read_flash(i);
       }
       if(mg_json_get_num(hm->body, "$.host", &host) && mg_json_get_num(hm->body, "$.device", &device)){
-          buffer[0] = (uint8_t)host;
-          buffer[1] = (uint8_t)device;
+          buffer[HOST_MODE_OFFSET] = (uint8_t)host;
+          buffer[DEVICE_MODE_OFFSET] = (uint8_t)device;
           //BLUETOOTH MODE
           if(hm->body.len > 21){
             double mac;
             if(mg_json_get_num(hm->body, "$.mac[0]", &mac)){
-              buffer[2] = (uint8_t)mac;
+              buffer[BLUETOOTH_HOST_ADDR_OFFSET] = (uint8_t)mac;
               uint8_t path[10];
-              for(int i = 1; i < 6; i++){
+              for(int i = 1; i < BLUETOOTH_HOST_ADDR_SIZE; i++){
                 sprintf(path, "$.mac[%d]", i);
                 mg_json_get_num(hm->body, path, &mac);
-                buffer[2+i] = mac; 
+                buffer[BLUETOOTH_HOST_ADDR_OFFSET + i] = mac;
               }
             }
             mg_json_get_num(hm->body, "$.bhid", &bhid);
-            buffer[8] = (uint8_t)bhid;
+            buffer[BLUETOOTH_HOST_HID_SET_OFFSET] = (uint8_t)bhid;
           }
           //Write to flash
           write_flash(buffer, 1);
@@ -93,14 +94,14 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       double features = 0;
       //copy the saved old data
       uint8_t buffer[256];
-      for (int i = 0; i < 34; ++i)
+      for (int i = 0; i < TOTAL_SIZE_IN_FLASH; ++i)
       {
         buffer[i] = read_flash(i);
       }
 
       mg_json_get_num(hm->body, "$.features[0]", &features);
       if(!(uint8_t)features){
-        buffer[9] = 0;
+        buffer[SET_FEATURE_OFFSET] = 0;
         //Write to flash
         write_flash(buffer, 1);
         //Reply
@@ -110,15 +111,21 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
       }
       else{
         uint8_t path[15];
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < (SET_FEATURE_SIZE + SIZE_FEATURES_SIZE + FEATURES_SIZE); i++){
           sprintf(path, "$.features[%d]", i);
           mg_json_get_num(hm->body, path, &features);
-          buffer[9+i] = (uint8_t)features;
+          buffer[SET_FEATURE_OFFSET + i] = (uint8_t)features;
         }
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < DATA_FEATURES_SIZE; i++){
           sprintf(path, "$.data[%d]", i);
           mg_json_get_num(hm->body, path, &features);
-          buffer[19+i] = (uint8_t)features;
+          buffer[DATA_FEATURES_OFFSET + i] = (uint8_t)features;
+        }
+        //Read buttons bytes from Fast switch mode
+        for(int i = 0; i < SWITCH_MODE_BUTTONS_SIZE; i++){
+          sprintf(path, "$.data[%d]", 8 + i);
+          mg_json_get_num(hm->body, path, &features);
+          buffer[SWITCH_MODE_BUTTONS_OFFSET + i] = (uint8_t)features;
         }
         //Write to flash
         write_flash(buffer, 1);
@@ -130,13 +137,13 @@ static void fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
     }
     else if(mg_http_match_uri(hm, "/read_data")){
       uint8_t buffer[256];
-      for (int i = 0; i < 27; ++i)
+      for (int i = 0; i < TOTAL_SIZE_IN_FLASH; ++i)
       {
         // Void wrong data
         buffer[i] = (read_flash(i) == 0xff ? 0 : read_flash(i));
       }
       // Array to string
-      uint8_t size = 27;
+      uint8_t size = TOTAL_SIZE_IN_FLASH;
       uint8_t path[size*3];
       uint8_t offset = 0;
       path[0] = '[';

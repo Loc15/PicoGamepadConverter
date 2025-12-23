@@ -8,6 +8,7 @@
 #include "hardware/sync.h"
 #include "hardware/structs/ioqspi.h"
 #include "hardware/structs/sio.h"
+#include "hardware/watchdog.h"
 #include "pico_flash.h"
 
 #include "utils.h"
@@ -158,7 +159,7 @@ uint8_t what_pio_use(uint8_t host){
 void save_wii_addr(void *wii_addr){
     //Copy the saved old data
     uint8_t buffer[256];
-    for (int i = 0; i < 27; ++i){
+    for (int i = 0; i < 36; ++i){
         buffer[i] = read_flash(i);
     }
     // Set saved wii_addr
@@ -169,4 +170,21 @@ void save_wii_addr(void *wii_addr){
 
     //Write to flash
     write_flash(buffer, 1);
+}
+
+void swap_modes_in_flash(void *alternative_mode) {
+    //Copy the saved old data
+    uint8_t buffer[256];
+    for (int i = 0; i < TOTAL_SIZE_IN_FLASH; ++i){
+        buffer[i] = read_flash(i);
+    }
+    //Swap modes
+    buffer[DATA_FEATURES_OFFSET + SWITCH_MODE] = buffer[DEVICE_MODE_OFFSET];
+    buffer[DEVICE_MODE_OFFSET] = *(uint8_t *)alternative_mode;
+
+    //Write to flash
+    write_flash(buffer, 1);
+
+    /*RESET*/
+    watchdog_reboot(0, SRAM_END, 500);
 }

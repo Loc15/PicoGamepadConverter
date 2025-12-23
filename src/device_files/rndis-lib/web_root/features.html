@@ -141,7 +141,25 @@ input[type=checkbox]{
 }
 
 
-</style></head><body><div class="header"><h1>Set features</h1><p><em>Choose features to set</em></p></div><div id="enable_div"><p><b>Enable features</b></p><input class="switch-button" type="checkbox" id="enable_features"><label class="label_checkbox" for="enable_features"></label></div><div id="option_box"><ul><li><div class="box_li"><p>Block Analog</p><div class="slider_box"><input class="switch-button" type="checkbox" id="block_L"><label class="label_checkbox" for="block_L"></label><p>Left Analog</p></div><div class="slider_box"><input class="switch-button" type="checkbox" id="block_R"><label class="label_checkbox" for="block_R"></label><p>Right Analog</p></div></div></li><li><div class="box_li"><p>Swap Dpad</p><div class="slider_box"><input class="switch-button" type="checkbox" id="Swap Dpad"><label class="label_checkbox" for="Swap Dpad"></label></div></div></li><li><div class="box_li"><p>Deadzone</p><div class="slider_box"><input class="switch-button" type="checkbox" id="Deadzone_L"><label class="label_checkbox" for="Deadzone_L"></label><p>Left Analog</p><input type="range" id="slider_left" min="0" max="100" value="0" step="5" oninput="this.nextSibling.value = this.value"><output id="value_slider_L"></output></div><div class="slider_box"><input class="switch-button" type="checkbox" id="Deadzone_R"><label class="label_checkbox" for="Deadzone_R"></label><p>Right Analog</p><input type="range" id="slider_right" min="0" max="100" value="0" step="5" oninput="this.nextSibling.value = this.value"><output id="value_slider_R"></output></div></div></li></ul></div><div id="save_div"><button class="save_btn" id="save_features">Save features</button></div><div id="back_div"><a href="/"><button class="navigation">Back to config mode</button></a></div><script>const value_of_features = {'Block Analog':0, 'Swap Dpad':1, 'Deadzone':2};
+</style></head><body><div class="header"><h1>Set features</h1><p><em>Choose features to set</em></p></div><div id="enable_div"><p><b>Enable features</b></p><input class="switch-button" type="checkbox" id="enable_features"><label class="label_checkbox" for="enable_features"></label></div><div id="option_box"><ul><li><div class="box_li"><p>Block Analog</p><div class="slider_box"><input class="switch-button" type="checkbox" id="block_L"><label class="label_checkbox" for="block_L"></label><p>Left Analog</p></div><div class="slider_box"><input class="switch-button" type="checkbox" id="block_R"><label class="label_checkbox" for="block_R"></label><p>Right Analog</p></div></div></li><li><div class="box_li"><p>Swap Dpad</p><div class="slider_box"><input class="switch-button" type="checkbox" id="Swap Dpad"><label class="label_checkbox" for="Swap Dpad"></label></div></div></li><li><div class="box_li"><p>Deadzone</p><div class="slider_box"><input class="switch-button" type="checkbox" id="Deadzone_L"><label class="label_checkbox" for="Deadzone_L"></label><p>Left Analog</p><input type="range" id="slider_left" min="0" max="100" value="0" step="5" oninput="this.nextSibling.value = this.value"><output id="value_slider_L"></output></div><div class="slider_box"><input class="switch-button" type="checkbox" id="Deadzone_R"><label class="label_checkbox" for="Deadzone_R"></label><p>Right Analog</p><input type="range" id="slider_right" min="0" max="100" value="0" step="5" oninput="this.nextSibling.value = this.value"><output id="value_slider_R"></output></div></div></li><li><div class="box_li"><p>Switch mode</p><div class="slider_box"><input class="switch-button" type="checkbox" id="switch_mode"><label class="label_checkbox" for="switch_mode"></label><div style="display: flex; flex-direction: row"><select class="button_switch_mode"><option value="A">A</option><option value="B">B</option><option value="X">X</option><option value="Y">Y</option><option value="LB">LB</option><option value="RB">RB</option><option value="START">START</option><option value="BACK">BACK</option><option value="HOME" selected>HOME</option></select><p>+</p><select class="button_switch_mode"><option value="A">A</option><option value="B">B</option><option value="X">X</option><option value="Y">Y</option><option value="LB">LB</option><option value="RB">RB</option><option value="START">START</option><option value="BACK" selected>BACK</option><option value="HOME">HOME</option></select><p>-></p><select id="second_mode"><option value="Xinput">Xinput</option><option value="Switch">Switch</option><option value="Dinput">Dinput</option><option value="Bluetooth">Bluetooth</option><option value="PS1/PS2">PS1/PS2</option><option value="Gamecube">Gamecube</option><option value="Wii">Wii</option></select></div></div></div></li></ul></div><div id="save_div"><button class="save_btn" id="save_features">Save features</button></div><div id="back_div"><a href="/"><button class="navigation">Back to config mode</button></a></div><script>const value_of_features = {'Block Analog':0, 'Swap Dpad':1, 'Deadzone':2, 'Switch mode': 3};
+// BUTTON SHIFT POSITION + POSITION BYTE (HIGH OR LOW BYTE)
+const XINPUT_GAMEPAD = {
+    'A': (4 | (1 << 4)),
+    'B': (5 | (1 << 4)),
+    'X': (6 | (1 << 4)),
+    'Y': (7 | (1 << 4)),
+    'LB': (0 | (1 << 4)),
+    'RB': (1 | (1 << 4)),
+    'START': (4 | (0 << 4)),
+    'BACK': (5 | (0 << 4)),
+    'HOME': (2 | (1 << 4)),
+    'LS': (6 | (0 << 4)),
+    'RS': (7 | (0 << 4))
+};
+
+//MODES
+const MODES = {'Xinput':0, 'Switch':1, 'Dinput':2,
+    'Keyboard PS/2':3, 'PS1/PS2':4, 'Bluetooth': 5, 'Wii': 6, 'Gamecube': 7, 'Nintendo 64': 8};
 
 const enable_switch = document.getElementById("enable_features");
 let option_box_div = document.getElementById("option_box");
@@ -203,6 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
                                     slider_R.value = response[21]&0x7F;
                                 }
                                 break;
+                            case value_of_features["Switch mode"]:
+                                const switch_mode_f = document.getElementById("switch_mode");
+                                switch_mode_f.checked = true;
+                                function getKeyByValue(object, value) {
+                                    return Object.keys(object).find(key => object[key] === value);
+                                }
+                                //Set selects values
+                                const buttons = document.getElementsByClassName('button_switch_mode');
+                                Array.from(buttons).forEach((button, index) => {
+                                    button.value = getKeyByValue(XINPUT_GAMEPAD, response[34 + index]);
+                                });
+                                //Set second mode
+                                document.getElementById("second_mode").value = getKeyByValue(MODES,response[22]);
+                                break;
                         }
                     }
                 }
@@ -224,7 +256,8 @@ enable_switch.onchange = function () {
 }
 
 function get_features(){
-    let send_features = {"features":[0,0,0,0,0,0,0,0,0,0], "data":[0,0,0,0,0,0,0,0]};
+    // "features": enable+size+features[8] | "data": data_features[8]+switch_buttons[2]
+    let send_features = {"features":[0,0,0,0,0,0,0,0,0,0], "data":[0,0,0,0,0,0,0,0,0,0]};
 
     if(!enable_switch.checked){
         //enable
@@ -277,6 +310,23 @@ function get_features(){
                 send_features["data"][value_of_features["Deadzone"]] =  ( 1 << 7) |
                     (0x7F & slider_R.value);
             }
+        }
+
+        const switch_mode = document.getElementById("switch_mode");
+        if(switch_mode.checked){
+            send_features["features"][counter + 2] = value_of_features["Switch mode"];
+            counter++;
+
+            //Second mode
+            const mode_2 = document.getElementById("second_mode");
+            send_features["data"][value_of_features["Switch mode"]] = MODES[mode_2.value];
+
+            //Get data from selects
+            const buttons = document.getElementsByClassName('button_switch_mode');
+            Array.from(buttons).forEach((button, index) => {
+                send_features["data"][8 + index] = XINPUT_GAMEPAD[button.value];
+            })
+
         }
 
         send_features["features"][1] = counter;
