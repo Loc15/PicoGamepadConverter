@@ -380,7 +380,11 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->wiimote.ir_y = XINPUT_TO_WIIMOTE(host_report.sThumbLY);
 
                     /*check if it wanna change the mode*/
-                    if (device_report->wiimote.one & device_report->wiimote.two) {
+                    if (device_report->wiimote.home & device_report->wiimote.down) {
+                        /*Clean values*/
+                        device_report->wiimote.home = 0;
+                        device_report->wiimote.down = 0;
+                        /*Set switch*/
                         device_report->switch_mode = 1;
                     }
                         /*wait to change to zero*/
@@ -416,7 +420,11 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->nunchuk.z = host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
 
                     /*check if it wanna change the mode*/
-                    if (device_report->wiimote.one & device_report->wiimote.two) {
+                    if (device_report->wiimote.home & device_report->wiimote.down) {
+                        /*Clean values*/
+                        device_report->wiimote.home = 0;
+                        device_report->wiimote.down = 0;
+                        /*Set switch*/
                         device_report->switch_mode = 1;
                     }
                         /*wait to change to zero*/
@@ -477,7 +485,11 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->classic.rs_y = (uint8_t) ((host_report.sThumbRY / 32768.0)  * 15 +  15);
 
                     /*check if it wanna change the mode*/
-                    if (device_report->classic.x & device_report->classic.y) {
+                    if (device_report->classic.home & device_report->classic.down) {
+                        /*Clean values*/
+                        device_report->classic.home = 0;
+                        device_report->classic.down = 0;
+                        /*Set switch*/
                         device_report->switch_mode = 1;
                     }
                         /*wait to change to zero*/
