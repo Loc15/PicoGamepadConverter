@@ -38,7 +38,7 @@
 #if PICO_W
     #define XINPUT_TO_WIIMOTE(a) ((a>>8))
     #define XINPUT_TO_CLASSIC_X(a) ((a>>10) + 32)
-    #define XINPUT_TO_CLASSIC_Y(a) ((a>>11) + 32)
+    #define XINPUT_TO_CLASSIC_Y(a) ((a>>10) + 32)
 #endif
 
 /*XINPUT TO SWITCH*/
@@ -469,8 +469,12 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->classic.rt = host_report.bRightTrigger;
                     device_report->classic.ltrigger = (host_report.bLeftTrigger > 32 ? 1 : 0);    //digital button of lt
                     device_report->classic.rtrigger = (host_report.bRightTrigger > 32 ? 1 : 0);  //digital button of rt
-                    device_report->classic.ls_x = XINPUT_TO_CLASSIC_X(host_report.sThumbLX);
-                    device_report->classic.ls_y = XINPUT_TO_CLASSIC_Y(host_report.sThumbLY);
+                    //device_report->classic.ls_x =  (uint8_t)XINPUT_TO_CLASSIC_X(host_report.sThumbLX);
+                    //device_report->classic.ls_y = (uint8_t)XINPUT_TO_CLASSIC_Y(host_report.sThumbLY);
+                    device_report->classic.ls_x = (uint8_t) ((host_report.sThumbLX / 32768.0)  * 31 +  32);
+                    device_report->classic.ls_y = (uint8_t) ((host_report.sThumbLY / 32768.0)  * 31 +  32);
+                    device_report->classic.rs_x = (uint8_t) ((host_report.sThumbRX / 32768.0)  * 15 +  15);
+                    device_report->classic.rs_y = (uint8_t) ((host_report.sThumbRY / 32768.0)  * 15 +  15);
 
                     /*check if it wanna change the mode*/
                     if (device_report->classic.x & device_report->classic.y) {
