@@ -142,6 +142,7 @@ static WiimoteReport wiimote_report = {
         .mode = NO_EXTENSION,
         .fake_motion = 0,
         .center_accel = 0,
+        .sideway = 0,
         .console_info = {0}
 };
 

@@ -379,6 +379,14 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                     device_report->wiimote.ir_x = XINPUT_TO_WIIMOTE(host_report.sThumbLX);
                     device_report->wiimote.ir_y = XINPUT_TO_WIIMOTE(host_report.sThumbLY);
 
+                    /*sideway mode*/
+                    if(device_report->sideway & 0x1) {
+                        device_report->wiimote.down = host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
+                        device_report->wiimote.up = host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
+                        device_report->wiimote.left = host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
+                        device_report->wiimote.right = host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP;
+                    }
+
                     /*check if it wanna change the mode*/
                     if (device_report->wiimote.home & device_report->wiimote.down) {
                         /*Clean values*/
@@ -394,6 +402,18 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                             device_report->switch_mode = 0;
                             device_report->reset_ir = 1;
                         }
+                    }
+
+                    /*change to sideway*/
+                    if(device_report->wiimote.home & (host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ? 1 : 0)) {
+                        /*Clean values*/
+                        device_report->wiimote.home = 0;
+                        /*Set sideway*/
+                        device_report->sideway = ((0xF << 1) | (device_report->sideway & 0x1));
+                    }
+                    else if ((device_report->sideway >> 1) == 0xF) {
+                        /*set sideway*/
+                        device_report->sideway = !(device_report->sideway & 0x1);
                     }
                     break;
                 case WIIMOTE_AND_NUNCHUCK:

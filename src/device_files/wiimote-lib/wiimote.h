@@ -201,6 +201,7 @@ typedef struct{
   uint8_t reset_ir;
   uint8_t fake_motion;
   uint8_t center_accel;
+  uint8_t sideway;
   struct wii_console_info console_info;
 }WiimoteReport;
 
