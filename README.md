@@ -13,6 +13,9 @@ PicoGamepadCoverter is a project designed for RP2040, RP2350 or Raspberry Pi Pic
 - Different out modes (Dinput, Xinput, Switch, Bluetooth, PS1/PS2, Gamecube, WII)
 - Easy to use, no overcomplicated options.
 
+![Picogamepad_inputs](./docs/pico_inputs.png)
+![Picogamepad_outputs](./docs/pico_outputs.png)
+![rp2350_usb](./docs/rp2350-usb.png)
 ---
 ## Getting Started
 
@@ -21,23 +24,21 @@ To get started with PicoGamepadConverter, follow the steps below:
 ### Prerequisites
 
 - Raspberry Pi Pico microcontroller or another RP2040 or RP2350 boards.
-- OTG cable (micro-USB or USB-C it depends on your board)
-- USB female connector (Recommended be the same type of OTG cable)
+- OTG cable (micro-USB or USB-C it depends on your board, it's only need it if you a USB host mode)
+- USB female connector (Recommended be the same type of OTG cable, it's only need it if you use a USB device mode and USB host mode)
 - USB cable (micro-USB or USB-C it depends on your board)
-- Two push buttons (_Optional but RECOMMENDED!_)
-- Breadboard (_Optional_)
 
 ### Installation
 
 1. [Download](https://github.com/Loc15/PicoGamepadConverter/releases) the build program and copy on the microcontroller.
 
 2. Make the connections.
-
-![schematic](./docs/pico_pinout.png)
-![conections1](./docs/bread_board1.jpg)
+    - This depends on the mode are you using. Check below for more information. 
 ![conections2](./docs/bread_board2.jpg)
 
-3. Go to configuration mode pressing the button on 18 GPIO on start. On WEB mode the LED start to blink.
+3. Go to configuration mode pressing the **BOOSTEL** button after you power on the pico. On WEB mode the LED start to blink.
+
+![Picogamepad_boostel](./docs/Pico_Boostel.png)
 
 4. Choose the modes on the web server. Access http://192.168.3.1 in a web browser to begin configuration.
 
@@ -183,7 +184,7 @@ You can set some additional configuration if you required:
 - **Block analogs** -> Disable the analog stick and keeping it on center.
 - **Swap Dpad and Left analog.**
 - **Add deadzone to analogs.**
-
+- **Change between two modes using only the gamepad**
 ---
 
 ## Testing
