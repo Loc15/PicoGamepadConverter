@@ -15,7 +15,7 @@ PicoGamepadCoverter is a project designed for RP2040, RP2350 or Raspberry Pi Pic
 
 ![Picogamepad_inputs](./docs/pico_inputs.png)
 ![Picogamepad_outputs](./docs/pico_outputs.png)
-![rp2350_usb](./docs/rp2350-usb.png)
+![rp2350_usb](./docs/rp2350-usb.png)(https://www.waveshare.com/rp2350-usb-a.htm)
 ---
 ## Getting Started
 
