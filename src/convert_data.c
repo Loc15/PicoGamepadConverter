@@ -9,6 +9,7 @@
 #if PICO_W
     #include "bluetooth_descriptors.h"
     #include "wiimote.h"
+    #include "wm_reports.h"
 #endif
 //Host
 #include "xinput_definitions.h"
@@ -21,7 +22,6 @@
 
 #include <stdio.h>
 #include "utils.h"
-#include "wm_reports.h"
 #include "pico/flash.h"
 
 //Definitions
