@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectBluetooth.value = getKeyByValue(bluetooth_hid_options, response[8]);
                     const macBluetooth = document.getElementById('mac_input');
                     macBluetooth.value = response.slice(2, 8).map(function (number) {
-                        return number.toString(16);
+                        return number.toString(16).padStart(2, '0');
                     }).toString().toUpperCase().replaceAll(',', ':');
                 }
             });
