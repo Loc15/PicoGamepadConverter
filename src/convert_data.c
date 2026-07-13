@@ -259,8 +259,6 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                                         (N64_MASK_R & joybus_response[1] ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) | (N64_MASK_RESET & joybus_response[1] ? XINPUT_GAMEPAD_GUIDE : 0) |
                                         (N64_MASK_C_UP & joybus_response[1] ? XINPUT_GAMEPAD_BACK : 0);
 
-                host_report.wButtons = (N64_MASK_RESET & joybus_response[1] ? host_report.wButtons & (~XINPUT_GAMEPAD_RIGHT_SHOULDER & ~XINPUT_GAMEPAD_LEFT_SHOULDER) : host_report.wButtons);
-
                 host_report.bRightTrigger = (N64_MASK_Z & joybus_response[0] ? 0xFF : 0);
                 host_report.bLeftTrigger = (N64_MASK_C_RIGHT & joybus_response[1] ? 0xFF : 0);
 
@@ -497,51 +495,9 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                             device_report->center_accel = 1;
                         }
                     }
+
                     break;
                 case CLASSIC_CONTROLLER:
-                    /*new data*/
-                    device_report->classic.a = host_report.wButtons & XINPUT_GAMEPAD_A;
-                    device_report->classic.b = host_report.wButtons & XINPUT_GAMEPAD_B;
-                    device_report->classic.x = host_report.wButtons & XINPUT_GAMEPAD_Y;
-                    device_report->classic.y = host_report.wButtons & XINPUT_GAMEPAD_X;
-                    device_report->classic.home = host_report.wButtons & XINPUT_GAMEPAD_GUIDE;
-                    device_report->classic.minus = host_report.wButtons & XINPUT_GAMEPAD_BACK;
-                    device_report->classic.plus = host_report.wButtons & XINPUT_GAMEPAD_START;
-                    device_report->classic.up = host_report.wButtons & XINPUT_GAMEPAD_DPAD_UP;
-                    device_report->classic.down = host_report.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
-                    device_report->classic.left = host_report.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
-                    device_report->classic.right = host_report.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
-                    device_report->classic.lz = host_report.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER;
-                    device_report->classic.rz = host_report.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER;
-                    device_report->classic.lt = host_report.bLeftTrigger;
-                    device_report->classic.rt = host_report.bRightTrigger;
-                    device_report->classic.ltrigger = (host_report.bLeftTrigger > 32 ? 1 : 0);    //digital button of lt
-                    device_report->classic.rtrigger = (host_report.bRightTrigger > 32 ? 1 : 0);  //digital button of rt
-                    //device_report->classic.ls_x =  (uint8_t)XINPUT_TO_CLASSIC_X(host_report.sThumbLX);
-                    //device_report->classic.ls_y = (uint8_t)XINPUT_TO_CLASSIC_Y(host_report.sThumbLY);
-                    device_report->classic.ls_x = (uint8_t) ((host_report.sThumbLX / 32768.0)  * 31 +  32);
-                    device_report->classic.ls_y = (uint8_t) ((host_report.sThumbLY / 32768.0)  * 31 +  32);
-                    device_report->classic.rs_x = (uint8_t) ((host_report.sThumbRX / 32768.0)  * 15 +  15);
-                    device_report->classic.rs_y = (uint8_t) ((host_report.sThumbRY / 32768.0)  * 15 +  15);
-
-                    /*check if it wanna change the mode*/
-                    if (device_report->classic.home & device_report->classic.down) {
-                        /*Clean values*/
-                        device_report->classic.home = 0;
-                        device_report->classic.down = 0;
-                        /*Set switch*/
-                        device_report->switch_mode = 1;
-                    }
-                        /*wait to change to zero*/
-                    else {
-                        if (device_report->switch_mode) {
-                            device_report->mode = DJ_HERO_TURNABLE;
-                            device_report->switch_mode = 0;
-                            device_report->reset_ir = 1;
-                        }
-                    }
-                    break;
-                case DJ_HERO_TURNABLE:
                     /*new data*/
                     device_report->classic.a = host_report.wButtons & XINPUT_GAMEPAD_A;
                     device_report->classic.b = host_report.wButtons & XINPUT_GAMEPAD_B;
@@ -583,7 +539,6 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                             device_report->reset_ir = 1;
                         }
                     }
-                    break;
             }
 #endif
         }
