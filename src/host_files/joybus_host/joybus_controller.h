@@ -25,6 +25,8 @@ void joybus_controller_init(joybus_controller_t *joybus_config_data);
 
 void joybus_send_data(uint8_t *request, uint8_t dataLength, uint8_t responseLength);
 
+void updatePioOutputSize(uint8_t autoPullLength);
+
 double get_scaled_analog_axis(double axisPos, int axis);
 
 #endif //MAIN_JOYBUS_CONTROLLER_H

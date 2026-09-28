@@ -48,6 +48,7 @@
 
     // Gamecube config
     #define GC_DAT_GPIO 29			// GC DATA
+    #define ALT_GC_DAT_GPIO 29      // GC DATA
 
     // Nintendo 64 config
     #define N64_DAT_GPIO 29			// N64 DATA
@@ -76,6 +77,8 @@
 
     // Gamecube config
     #define GC_DAT_GPIO 19			// GC DATA
+    // Alternative for GC host mode (used when DEVICE=PSX/GC)
+    #define ALT_GC_DAT_GPIO 9       // GC DATA
 
     // Nintendo 64 config
     #define N64_DAT_GPIO 19			// N64 DATA

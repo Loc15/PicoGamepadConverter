@@ -148,6 +148,7 @@ uint8_t what_pio_use(uint8_t host){
         case KBD_PS2:
         case PSX:
         case N64:
+        case GC:
         case BLUETOOTH:
         case WII:
             return 0;

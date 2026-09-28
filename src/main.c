@@ -32,6 +32,7 @@
 #include "process_keyboard.h"
 #include "psx.h"
 #include "n64_controller.h"
+#include "gamecube_controller.h"
 
 #if PICO_W
 
@@ -132,7 +133,8 @@ static GCReport gcReport = {
         .r = 0x00
 };
 
-static uint8_t joybus_response[4];
+/* N64 uses 4 bytes; GameCube poll uses 8 — buffer must fit the largest Joybus response. */
+static uint8_t joybus_response[8];
 
 static keyboard_mouse_report_t keyboard_composite = {
         .keyboard_report = 0,
@@ -166,6 +168,18 @@ static BluetoothReport bluetooth_report = {
 };
 #endif
 
+static void gc_host_run_loop(uint8_t pio_sel, uint8_t gc_data_pin) {
+    gamecube_controller_init(pio_sel, gc_data_pin, joybus_response);
+    while (true) {
+        gamecube_controller_update_state();
+        // Keep the SEL ISR (which resets core1) from firing mid-update, so core1
+        // never reads a half-written psxReport.
+        uint32_t irq = save_and_disable_interrupts();
+        sendReportData(joybus_response);
+        restore_interrupts(irq);
+    }
+}
+
 /*------------- MAIN -------------*/
 
 // core1: handle host events
@@ -193,6 +207,9 @@ void core1_main() {
                 n64_controller_update_state();
                 sendReportData(joybus_response);
             }
+            break;
+        case GC:
+            gc_host_run_loop(1, GC_DAT_GPIO);
             break;
         case BLUETOOTH:
             //It can't have input and output bluetooth simultaneously
@@ -350,6 +367,9 @@ int main(void) {
                         n64_controller_update_state();
                         sendReportData(joybus_response);
                     }
+                    break;
+                case GC:
+                    gc_host_run_loop(1, ALT_GC_DAT_GPIO);
                     break;
                 case BLUETOOTH:
 #if PICO_W
