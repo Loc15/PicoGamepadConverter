@@ -123,9 +123,13 @@ To get started with PicoGamepadConverter, follow the steps below:
 ---
 ### Gamecube
 
-- The connection for Gamecube device mode is **19 GPIO** for **DATA PIN**.
+- The connection for Gamecube controller host mode is **19 GPIO** for **DATA PIN**.
+
+- The alternative connection for Gamecube controller host mode (when DEVICE=PSX/GC) is **9 GPIO** for **DATA PIN**.
 
 ![gamecube_device_connection](./docs/Gamecube_pinout.png)
+
+- The connection for Gamecube device mode is **19 GPIO** for **DATA PIN**.
 
 - On Gamecube device mode, the host connection is on **native usb female connector on the microcontroller**.
 

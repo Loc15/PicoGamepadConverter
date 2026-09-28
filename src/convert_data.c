@@ -15,13 +15,16 @@
 #include "hid_definitions.h"
 #include "psx_definitions.h"
 #include "n64_controller.h"
+#include "gamecube_controller.h"
 #include "process_keyboard.h"
 //itself
 #include "convert_data.h"
 
 #include <stdio.h>
 #include "utils.h"
-#include "wm_reports.h"
+#if PICO_W
+    #include "wm_reports.h"
+#endif
 #include "pico/flash.h"
 
 //Definitions
@@ -51,6 +54,26 @@ const uint8_t SWITCH_DEVICE_HAT[] = {SWITCH_HAT_NOTHING, SWITCH_HAT_UP, SWITCH_H
 features_t features;
 void set_features(xinput_gamepad_t *host_report);
 
+/*
+ * The Gamecube analog range is from about 34 to 222. This was determined
+ * by testing several different Gamecube Controller models
+ * (Nintendo original, Nintendo 2018 re-release, and black market knockoff).
+ *
+ * This function maps the physical GameCube analog range (~34..222) to nearly
+ * the full byte range 0..254, clamping at the ends. The output is intentionally
+ * capped at 254 rather than 255: feeding 255 into -HID_TO_XINPUT_Y would produce
+ * +32768, which does not fit in the int16 sThumb fields and wraps to -32768,
+ * inverting the axis at the extremes. 254 maps cleanly to +-32512. Center (raw 128)
+ * maps to exactly 127 since (128-34)*254/(222-34) == 94*254/188 == 127.
+ */
+static inline uint8_t scale_gc_axis(uint8_t raw) {
+    const int32_t lo = 34;
+    const int32_t hi = 222;
+    int32_t v = ((int32_t)raw - lo) * 254 / (hi - lo);
+    if (v < 0)   v = 0;
+    if (v > 254) v = 254;
+    return (uint8_t)v;
+}
 
 void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_device){
 
@@ -266,6 +289,59 @@ void new_report_fun(void *report, MODE mode_host, void *new_report, MODE mode_de
                 host_report.sThumbLY = (int16_t)(n64_convert_axis(joybus_response[3], XINPUT_JOYSTICK_MID_UINT16, 1) - XINPUT_JOYSTICK_MID_UINT16);
                 host_report.sThumbRX = 0;
                 host_report.sThumbRY = 0;
+                }
+            break;
+        case GC:{
+                uint8_t *joybus_response = report;
+
+                host_report.wButtons = (GC_MASK_DPAD_UP & joybus_response[1] ? XINPUT_GAMEPAD_DPAD_UP : 0) |
+                                       (GC_MASK_DPAD_DOWN & joybus_response[1] ? XINPUT_GAMEPAD_DPAD_DOWN : 0) |
+                                       (GC_MASK_DPAD_LEFT & joybus_response[1] ? XINPUT_GAMEPAD_DPAD_LEFT : 0) |
+                                       (GC_MASK_DPAD_RIGHT & joybus_response[1] ? XINPUT_GAMEPAD_DPAD_RIGHT : 0) |
+                                       (GC_MASK_START & joybus_response[0] ? XINPUT_GAMEPAD_START : 0) |
+                                       /**
+                                        * The "correct" ABXY mapping is non-obvious. The original use case
+                                        * is mainly for controlling a PS2 with a Gamecube DDR mat, which
+                                        * lacks X and Y, so the A and B mapping is very important.
+                                        *
+                                        * Depending on game locale, the optimal mapping is different.
+                                        *
+                                        * Optimal Gamecube to PS2 (NTSC-U) mapping:
+                                        * A -> X (XINPUT_GAMEPAD_A)
+                                        * B -> ∆ (XINPUT_GAMEPAD_Y)
+                                        * X -> □ (XINPUT_GAMEPAD_X)
+                                        * Y -> O (XINPUT_GAMEPAD_B)
+                                        *
+                                        * Optimal Gamecube to PS2 (NTSC-J) mapping:
+                                        * A -> O (XINPUT_GAMEPAD_B)
+                                        * B -> X (XINPUT_GAMEPAD_A)
+                                        * X -> □ (XINPUT_GAMEPAD_X)
+                                        * Y -> ∆ (XINPUT_GAMEPAD_Y)
+                                        *
+                                        * For now defaulted to the NTSC-U-optimized mapping.
+                                        */
+                                       (GC_MASK_A & joybus_response[0] ? XINPUT_GAMEPAD_A : 0) |
+                                       (GC_MASK_B & joybus_response[0] ? XINPUT_GAMEPAD_Y : 0) |
+                                       (GC_MASK_X & joybus_response[0] ? XINPUT_GAMEPAD_X : 0) |
+                                       (GC_MASK_Y & joybus_response[0] ? XINPUT_GAMEPAD_B : 0) |
+                                       (GC_MASK_L & joybus_response[1] ? XINPUT_GAMEPAD_LEFT_SHOULDER : 0) |
+                                       (GC_MASK_R & joybus_response[1] ? XINPUT_GAMEPAD_RIGHT_SHOULDER : 0) |
+                                       (GC_MASK_Z & joybus_response[1] ? XINPUT_GAMEPAD_BACK : 0);
+
+                host_report.bLeftTrigger = joybus_response[6];
+                host_report.bRightTrigger = joybus_response[7];
+                if (GC_MASK_L & joybus_response[1]) {
+                    host_report.bLeftTrigger = 0xFF;
+                }
+                if (GC_MASK_R & joybus_response[1]) {
+                    host_report.bRightTrigger = 0xFF;
+                }
+
+                host_report.sThumbLX = HID_TO_XINPUT_X(scale_gc_axis(joybus_response[2]));
+                host_report.sThumbRX = HID_TO_XINPUT_X(scale_gc_axis(joybus_response[4]));
+                // GameCube Y-axis is inverted relative to standard HID, so we negate the value
+                host_report.sThumbLY = -HID_TO_XINPUT_Y(scale_gc_axis(joybus_response[3]));
+                host_report.sThumbRY = -HID_TO_XINPUT_Y(scale_gc_axis(joybus_response[5]));
                 }
             break;
         default:
