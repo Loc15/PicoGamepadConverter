@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - board: pico
+            name: PICO
+          - board: pico_w
+            name: PICO_W
+          - board: pico2
+            name: PICO2
+          - board: pico2_w
+            name: PICO2_W
+          - board: adafruit_feather_rp2040_usb_host
+            name: Adafruit_Feather_RP2040
+          - board: waveshare_rp2350_usb_a
+            name: Waveshare_RP2350_USB
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v6.0.1
+        with:
+          submodules: recursive
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+
+      - name: Configure
+        run: cmake -S src -B build -G Ninja -DPICO_BOARD=${{ matrix.board }}
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Rename UF2
+        run: cp build/PicoGamepadConverter.uf2 PicoGamepadConverter_${{ matrix.name }}.uf2
+
+      - name: Upload UF2
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: PicoGamepadConverter_${{ matrix.name }}
+          path: PicoGamepadConverter_${{ matrix.name }}.uf2
+          if-no-files-found: error
