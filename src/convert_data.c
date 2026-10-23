@@ -21,7 +21,9 @@
 
 #include <stdio.h>
 #include "utils.h"
-#include "wm_reports.h"
+#if PICO_W
+    #include "wm_reports.h"
+#endif
 #include "pico/flash.h"
 
 //Definitions
