@@ -91,7 +91,8 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
   case XINPUT:
     return xinput_configuration_descriptor;
   case WEB:
-    return rndis_configuration;
+    // Index 0 = RNDIS (Windows), index 1 = CDC-ECM (macOS)
+    return (index < TU_ARRAY_SIZE(net_configuration_arr)) ? net_configuration_arr[index] : NULL;
   case SWITCH:
     return switch_configuration_descriptor;
   case DINPUT:
