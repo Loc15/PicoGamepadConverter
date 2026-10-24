@@ -347,10 +347,13 @@ bool xinputh_xfer_cb(uint8_t dev_addr, uint8_t ep_addr, xfer_result_t result, ui
             //Connect/Disconnect packet
             if (rdata[0] & 0x08)
             {
-                if (rdata[1] != 0x00 && xid_itf->connected == false)
+                //Bit 7 = controller present (0x40 alone is only a headset)
+                if ((rdata[1] & 0x80) && xid_itf->connected == false)
                 {
                     TU_LOG2("XINPUT: WIRELESS CONTROLLER CONNECTED\n");
                     xid_itf->connected = true;
+                    //Light player 1 so the controller stops blinking. Non-blocking: we are in the transfer callback
+                    tuh_xinput_set_led(dev_addr, instance, 1, false);
                 }
                 else if (rdata[1] == 0x00 && xid_itf->connected == true)
                 {
